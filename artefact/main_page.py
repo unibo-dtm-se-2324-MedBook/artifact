@@ -5,9 +5,10 @@ def main(page: Page):
     Bir_sin = '#3F888F'
     Vas = '#ABCDEF'
 
+
     def shrink(e):
-        page_2.controls[0].width = 100
-        page_2.controls[0].scale = transform.Scale(0.8, alignment=alignment.center_right)
+        page_2.controls[0].width = 80
+        page_2.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         page_2.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
         page_2.update()
 
@@ -102,33 +103,104 @@ def main(page: Page):
         )
     )
     
+    def go_to_page():
+        pass
+
     page_1 = Container(
-        width = 240, 
-        height = 450,
+        #width = 240, 
+        #height = 450,
         bgcolor = Bir_sin,
         border_radius= 35,
         padding = padding.only(top=20, left=20, right=20, bottom=5),
-        content = Column(
-            controls = [
-                Row(
-                    alignment="end",
-                    controls=[
-                        Container(
-                            border_radius=25,
-                            padding=padding.only(
-                                top=13,
-                                left=13,
-                            ),
-                            # height=50,
-                            # width=50,
-                            border=border.all(color="white", width=1),
-                            on_click=lambda e: restore(e),
-                            content=Text("<"),
+        content = Column(controls = [
+            Row(
+                controls=[IconButton(icon=Icons.KEYBOARD_RETURN, icon_color='white', on_click=lambda e: restore(e), icon_size=20, highlight_color ='#FFFAFA')],
+            ),
+            Container(
+                padding = padding.only(left=15),
+                content= Text("Your portable\nmedical card", size=15, weight="bold", color='white')
+            ),
+
+            Container(height=10),
+            Row(controls=[
+                TextButton(
+                    on_click=go_to_page(),
+                    content = Row(controls = [
+                        Icon(icons.SCHEDULE, color="white60"),
+                        Text(value="Schedule",
+                            size=15,
+                            weight=FontWeight.W_300,
+                            color="white",
+                            font_family="poppins"
                         )
-                    ],
-                ),
-            ]
-        )
+                    ])
+                )
+            ]),
+
+            Container(height=5),
+            Row(controls=[
+                TextButton(
+                    on_click=go_to_page(),
+                    content = Row(controls = [
+                        Icon(icons.EDIT_DOCUMENT, color="white60"),
+                        Text("Documents",
+                            size=15,
+                            weight=FontWeight.W_300,
+                            color="white",
+                            font_family="poppins"
+                        )
+                    ])
+                )
+            ]),                            
+
+            Container(height=5),
+            Row(controls=[
+                TextButton(
+                    on_click=go_to_page(),
+                    content = Row(controls = [
+                        Icon(icons.DOCUMENT_SCANNER, color="white60"),
+                        Text("Check",
+                            size=15,
+                            weight=FontWeight.W_300,
+                            color="white",
+                            font_family="poppins"
+                        )
+                    ])
+                )
+            ]), 
+
+            Container(height=5),
+            Row(controls=[
+                TextButton(
+                    on_click=go_to_page(),
+                    content = Row(controls = [
+                        Icon(icons.PERSON_OUTLINE, color="white60"),
+                        Text(value="Personal info",
+                            size=15,
+                            weight=FontWeight.W_300,
+                            color="white",
+                            font_family="poppins"
+                        )
+                    ])
+                )
+            ]),
+            
+            Container(height=20),
+            Row(controls=[
+                TextButton(
+                    on_click=go_to_page(),
+                    content = Row(controls = [
+                        Icon(icons.EXIT_TO_APP, color="white60"),
+                        Text("Exit",
+                            size=15,
+                            weight=FontWeight.W_300,
+                            color="white",
+                            font_family="poppins"
+                        )
+                    ])
+                )
+            ])
+        ])
     )
 
     page_2 = Row(
