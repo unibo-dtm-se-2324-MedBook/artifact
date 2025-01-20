@@ -5,3 +5,5 @@ base_height = 450
 Light_bgcolor = '#FFFAFA'
 Dark_bgcolor = '#3F888F'
 #Vas = '#ABCDEF'
+b_radius = 35
+txf_height = 35
