@@ -1,9 +1,7 @@
 from flet import *
+from utils.traits import *
 
 def main(page: Page):
-    BG = '#FFFAFA'
-    Bir_sin = '#3F888F'
-    Vas = '#ABCDEF'
 
 
     def shrink(e):
@@ -13,8 +11,8 @@ def main(page: Page):
         page_2.update()
 
     def restore(e):
-        page_2.controls[0].width = 240
-        page_2.controls[0].border_radius = 35
+        page_2.controls[0].width = base_width
+        page_2.controls[0].border_radius = b_radius
         page_2.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         page_2.update()
 
@@ -107,10 +105,8 @@ def main(page: Page):
         pass
 
     page_1 = Container(
-        #width = 240, 
-        #height = 450,
-        bgcolor = Bir_sin,
-        border_radius= 35,
+        bgcolor = Dark_bgcolor,
+        border_radius= b_radius,
         padding = padding.only(top=20, left=20, right=20, bottom=5),
         content = Column(controls = [
             Row(
@@ -206,10 +202,10 @@ def main(page: Page):
     page_2 = Row(
         alignment='end',
         controls=[Container(
-            width = 240, 
-            height = 450, 
-            bgcolor = BG,
-            border_radius= 35,
+            width = base_width, 
+            height = base_height, 
+            bgcolor = Light_bgcolor,
+            border_radius= b_radius,
             animate = animation.Animation(600, AnimationCurve.DECELERATE),
             animate_scale=animation.Animation(400, curve="decelerate"),
             padding = padding.only(top=20, left=20, right=20, bottom=5),
@@ -222,10 +218,10 @@ def main(page: Page):
     )
 
     container = Container(
-        width = 240, 
-        height = 450, 
-        bgcolor = BG,
-        border_radius= 35,
+        width = base_width, 
+        height = base_height, 
+        bgcolor = Light_bgcolor,
+        border_radius= b_radius,
         content=Stack(
             controls=[page_1, page_2]
         )
