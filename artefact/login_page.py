@@ -83,8 +83,8 @@ class LoginPage(Container):
                     height = base_height,
                     padding = padding.only(top = 20, left = 10, right = 10),
                     content= Column(controls=[
-                        Container(data = 'first_page', content = IconButton(icon=Icons.KEYBOARD_RETURN, icon_size=20, icon_color='white', bgcolor=Dark_bgcolor, highlight_color ='#FFFAFA')),
-                        Container(height=90),
+                        Container(data = 'first_page', height = 30, content = IconButton(icon=Icons.KEYBOARD_RETURN, icon_size=17, icon_color='white', bgcolor=Dark_bgcolor, highlight_color ='#FFFAFA')),
+                        Container(height=100),
                         Container(
                             padding = 10,
                             bgcolor = '#cc2d2b2c',
