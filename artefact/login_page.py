@@ -7,61 +7,46 @@ class LoginPage(Container):
         self.expand = True
         self.offset = transform.Offset(0,0,)
 
-        self.password_input = Container(
-            height = txf_height,
-            bgcolor= 'white',
-            border_radius = 10,
-            content = TextField(
-                hint_text='Password',
-                hint_style=TextStyle(
-                    size = 12,
-                    # font_family= 'poppins Regular',
-                    color = input_hint_color
-                ),
-                text_style= TextStyle(
-                    size = 12,
-                    #font_family= 'poppins Regular',
-                    color = input_hint_color
-                ),
-                # border = InputBorder.NONE,
-                # content_padding= content_padding,
-            )
-        )
+        self.view_passw = Text(value= 'View', color = Dark_bgcolor)
+        self.password = TextField(
+            password = True,
+            suffix=Container(
+                on_click= self.show_hide_passw,
+                content= self.view_passw),
+            hint_text = 'Password',
+            hint_style = TextStyle(size = 12, color = input_hint_color),
+            text_style = TextStyle( size = 12, color = input_hint_color))
         
         self.login_content = Column(controls = [
-            Row(alignment='center', controls = [Text(value= 'Login', weight='bold',size = 15, color='white'
-                # font_family = 'poppins bold',
-            )]),
+            Row(alignment='center', controls = [Text(value= 'Login', weight='bold',size = 15, color='white')]),
             Column(
                 spacing = 0,
                 controls=[
                     Text(value= 'Anastasiia Bakhmutova', weight='bold', size = 12, color='white'
                             #  self.name + ' ' + self.surname, 
-                            
-                        # font_family = 'poppins Semibold',
                     ),
                     Text(value= 'bakh@mail.com', size = 12, color='white'
                             #  self.email, 
-                            
-                        # font_family = 'poppins light',
                     ),
                 ]
             ),
-            self.password_input,
+            Container(
+                height=txf_height,
+                bgcolor='white',
+                border_radius=10,
+                content=self.password
+            ),
+            
             Container(
                 height = txf_height,
                 width = btn_width,
                 bgcolor= Dark_bgcolor,
                 border_radius = 10,
                 alignment= alignment.center,
-                content= Text(value='Continue', size = 14, color='white'
-                    # font_family= 'poppins Medium',
-                )
+                content= Text(value='Continue', size = 14, color='white')
             ),
             Container(height = 3),
-            Row(alignment='center', controls = [Text(value="Forgot your password?", color = 'white', size = 12)
-                #font_family= 'poppins Regular',
-            ]) 
+            Row(alignment='center', controls = [Text(value="Forgot your password?", color = 'white', size = 12)]),
         ])
         
         self.content = Container(
@@ -95,3 +80,14 @@ class LoginPage(Container):
                 )
             ])
         )
+
+    def show_hide_passw(self, e):
+        status = self.password.password
+        if status == True:
+            self.password.password = False
+            self.view_passw.value = 'Hide'
+        else: 
+            self.password.password = True
+            self.view_passw.value = 'View'
+        self.password.update()
+        self.view_passw.update()
