@@ -2,8 +2,8 @@ from flet import *
 
 from utils.traits import *
 from first_page import FirstPage
-# from login_page import LoginPage
-# from sign_up_page import SignUpPage
+from login_page import LoginPage
+from sign_up_page import SignUpPage
 # from main_page import MainPage
 
 class WindowDrag(UserControl):
@@ -11,7 +11,7 @@ class WindowDrag(UserControl):
         super().__init__()
 
     def build(self):
-        return Container(content=WindowDragArea(height = 10, content = Container(bgcolor='blue')))
+        return Container(content=WindowDragArea(height = 10, content = Container(bgcolor='black')))
 
 
 class App(UserControl):
@@ -28,10 +28,15 @@ class App(UserControl):
         self.page = page
         self.page.spacing = 0
         self.first_page = FirstPage()
+        self.login_page = LoginPage()
+        self.signup_page = SignUpPage()
+
         self.screen_views = Stack( # Stack используется для наложения (или "накладывания") различных элементов друг на друга
             expand = True,
             controls=[
-                self.first_page
+                # self.first_page
+                self.login_page
+                # self.signup_page    
             ]
         )
 
