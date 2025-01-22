@@ -117,10 +117,10 @@ class SignUpPage(Container):
         )
 
     def create_txtField(self, hint_name):
-            return TextField(
-                hint_text = hint_name,
-                hint_style = TextStyle(size = 12, color = input_hint_color),
-                text_style = TextStyle(size = 12, color = input_hint_color))
+        return TextField(
+            hint_text = hint_name,
+            hint_style = TextStyle(size = 12, color = input_hint_color),
+            text_style = TextStyle(size = 12, color = input_hint_color))
 
     def show_hide_passw(self, e):
         status = self.password.password
