@@ -29,11 +29,9 @@ class FirstPage(Container):
         )
         
         self.first_content = Column(controls = [
-            Row(alignment='center', controls = [Text(value= 'MedBook', weight='bold',size = 20, color='white'
-                # font_family = 'poppins bold',
-            )]),
+            Row(alignment='center', controls = [Text(value= 'MedBook', weight='bold',size = 20, color='white')]),
             Text(value= 'Health in a convenient format', weight='bold', size = 12, color='white'),
-            Container(height = 10),
+            Container(height = 3),
             self.email_input,
             Container(
                 height = txf_height,
@@ -41,14 +39,9 @@ class FirstPage(Container):
                 bgcolor= Dark_bgcolor,
                 border_radius = 10,
                 alignment= alignment.center,
-                content= Text(value='Continue', size = 14, color='white'
-                    # font_family= 'poppins Medium',
-                )
+                content= Text(value='Continue', size = 14, color='white')
             ),
-            Container(height = 3),
-            Row(alignment='center', controls = [Text(value="Forgot your password?", color = 'white', size = 12)
-                #font_family= 'poppins Regular',
-            ])  
+            Container(height = 2)
         ])
         
         self.content = Container(
@@ -70,7 +63,7 @@ class FirstPage(Container):
                     height = base_height,
                     padding = padding.only(top = 30, left = 10, right = 10),
                     content= Column(controls=[
-                        Container(height=130),
+                        Container(height=160),
                         Container(
                             padding = 10,
                             bgcolor = '#cc2d2b2c',
