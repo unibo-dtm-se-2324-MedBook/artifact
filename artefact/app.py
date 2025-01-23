@@ -4,7 +4,8 @@ from utils.traits import *
 from first_page import FirstPage
 from login_page import LoginPage
 from sign_up_page import SignUpPage
-# from main_page import MainPage
+from main_page import MainPage
+from forgot_password_page import ForgPasswPage
 
 class WindowDrag(UserControl):
     def __init__(self):
@@ -27,22 +28,32 @@ class App(UserControl):
 
         self.page = page
         self.page.spacing = 0
-        self.first_page = FirstPage()
-        self.login_page = LoginPage()
-        self.signup_page = SignUpPage()
 
+        # self.first_page = FirstPage(self.page)
+        self.first_page = FirstPage()
+
+        self.login_page = LoginPage(self.page)
+        self.signup_page = SignUpPage(self.page)
+        self.main_page = MainPage(self.page)
+        self.forgpassw_page = ForgPasswPage(self.page)
+        
+        print(f"self.first_page content: {self.first_page}"),
+        
         self.screen_views = Stack( # Stack используется для наложения (или "накладывания") различных элементов друг на друга
             expand = True,
             controls=[
-                # self.first_page
-                self.login_page
-                # self.signup_page    
+                self.first_page,
+                # self.login_page,
+                # self.signup_page,  
+                # self.main_page, 
+                # self.forgpassw_page, 
             ]
         )
-
+        
         self.building()
     
     def building(self):
         self.page.add(WindowDrag(), self.screen_views)
+        # self.page.update()
 
-app(target = App)
+app(target = App, assets_dir= 'assets')

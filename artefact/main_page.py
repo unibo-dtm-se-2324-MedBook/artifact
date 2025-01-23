@@ -3,38 +3,11 @@ from utils.traits import *
 
 class MainPage(Container):
 
-    def __init__(self):
+    def __init__(self, page: Page):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
-
-        #pages = {
-            #'/':View(
-                #'/',
-                    #[
-                        #container
-                    #]
-                #),
-            #'/add_pills':View(
-                #'/add_pills',
-                    #[
-                        #add_pills
-                    #]
-                #)
-        #}
-
-
-
-        #def route_change(route):
-            #page.views.clear()
-            #page.views.append(
-                #View(
-                    #'/',
-                    #[
-                        #container
-                    #]
-                #)
-            #)
+        self.page = page
 
         days_card = Row(scroll = 'auto')
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -204,9 +177,6 @@ class MainPage(Container):
                 controls=[self.navig, self.schedule]
             )
         )
-
-        #page.on_route_change = route_change
-        #page.go(page.route)
     
     def shrink(self, e):
         self.schedule.controls[0].width = 70
@@ -220,6 +190,8 @@ class MainPage(Container):
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
 
+
+    #############
     def go_to_page(self, e):
             pass
 

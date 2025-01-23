@@ -3,10 +3,11 @@ from utils.traits import *
 
 class SignUpPage(Container):
 
-    def __init__(self):
+    def __init__(self, page: Page):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
+        self.page = page
         
         self.name = self.create_txtField('Name')
         self.surname = self.create_txtField('Surname')

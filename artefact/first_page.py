@@ -2,10 +2,13 @@ from flet import *
 from utils.traits import *
 
 class FirstPage(Container):
+    # def __init__(self, page:Page):
     def __init__(self):
         super().__init__()
-        self.expand = True # атрибут expand может управлять тем, как элемент будет расширяться или сжиматься в пределах контейнера. в библиотеке Flet атрибут expand может использоваться, чтобы заставить элемент (например, кнопку или текстовое поле) занимать все доступное пространство в родительском контейнере.
+        self.expand = True # атрибут expand может управлять тем, как элемент будет расширяться или сжиматься в пределах контейнера. в библиотеке Flet атрибут expand может использоваться, чтобы заставить элемент (например, кнопку или текстовое поле) занимать все доступное пространство в родительском контейнере.        
         self.offset = transform.Offset(0,0,) # для Flet Offset может быть использован для представления смещения в двумерной системе координат
+        
+        # self.page = page
         
         self.email_input = Container(
             height = txf_height,
@@ -13,18 +16,8 @@ class FirstPage(Container):
             border_radius = 10,
             content = TextField(
                 hint_text='Email',
-                hint_style=TextStyle(
-                    size = 12,
-                    # font_family= 'poppins Regular',
-                    color = input_hint_color
-                ),
-                text_style= TextStyle(
-                    size = 12,
-                    #font_family= 'poppins Regular',
-                    color = input_hint_color
-                ),
-                # border = InputBorder.NONE,
-                # content_padding= content_padding,
+                hint_style=TextStyle(size = 12, color = input_hint_color),
+                text_style= TextStyle(size = 12, color = input_hint_color),
             )
         )
         
@@ -74,4 +67,3 @@ class FirstPage(Container):
                 ),
             ])
         )
-

@@ -2,10 +2,11 @@ from flet import *
 from utils.traits import *
 
 class LoginPage(Container):
-    def __init__(self):
+    def __init__(self, page:Page):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
+        self.page = page
 
         self.view_passw = Text(value= 'View', color = Dark_bgcolor)
         self.password = TextField(
@@ -46,7 +47,10 @@ class LoginPage(Container):
                 content= Text(value='Continue', size = 14, color='white')
             ),
             Container(height = 3),
-            Row(alignment='center', controls = [Text(value="Forgot your password?", color = 'white', size = 12)]),
+            Container(
+                content = Row(alignment='center', controls = [Text(value="Forgot your password?", color = 'white', size = 12)]),
+                on_click= lambda _: self.page.go('/forgot_passw')
+            )
         ])
         
         self.content = Container(
@@ -91,3 +95,5 @@ class LoginPage(Container):
             self.view_passw.value = 'View'
         self.password.update()
         self.view_passw.update()
+
+    
