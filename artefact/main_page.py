@@ -3,11 +3,10 @@ from utils.traits import *
 
 class MainPage(Container):
 
-    def __init__(self, page: Page):
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
-        self.page = page
 
         days_card = Row(scroll = 'auto')
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -103,7 +102,7 @@ class MainPage(Container):
                 Container(height=20),
                 Row(controls=[
                     TextButton(
-                        on_click= self.go_to_page,
+                        on_click= lambda _: self.page.go('/first_page'),
                         content = Row(controls = [
                             Icon(icons.EXIT_TO_APP, color="white60"),
                             Text("Exit",
