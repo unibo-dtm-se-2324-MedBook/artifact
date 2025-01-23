@@ -19,7 +19,7 @@ class ForgPasswPage(Container):
             )
         )
 
-        self.login_content = Column(controls = [
+        self.passw_content = Column(controls = [
             Row(alignment='center', controls = [Text(value= 'Forgot your password?', weight='bold',size = 15, color='white')]),
             Text(value= "Please, enter your email address below and we'l send you a link to reset your password", size = 12, color='white'),
             Container(height = 2),
@@ -60,7 +60,7 @@ class ForgPasswPage(Container):
                             padding = 10,
                             bgcolor = '#cc2d2b2c',
                             border_radius = 10,
-                            content = self.login_content
+                            content = self.passw_content
                         )
                     ])
                 )
