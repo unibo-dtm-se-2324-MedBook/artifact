@@ -8,35 +8,31 @@ class ForgPasswPage(Container):
         self.offset = transform.Offset(0,0,)
         self.page = page
 
+        self.email_input = Container(
+            height = txf_height,
+            bgcolor= 'white',
+            border_radius = 10,
+            content = TextField(
+                hint_text='Email',
+                hint_style=TextStyle(size = 12, color = input_hint_color),
+                text_style= TextStyle(size = 12, color = input_hint_color),
+            )
+        )
 
         self.login_content = Column(controls = [
-            Row(alignment='center', controls = [Text(value= 'Reset password', weight='bold',size = 15, color='white')]),
-            Column(
-                spacing = 0,
-                controls=[
-                    Text(value= 'Anastasiia Bakhmutova', weight='bold', size = 12, color='white'
-                            #  self.name + ' ' + self.surname, 
-                    ),
-                    Text(value= 'bakh@mail.com', size = 12, color='white'
-                            #  self.email, 
-                    ),
-                ]
-            ),
-            # Container(
-            #     height=txf_height,
-            #     bgcolor='white',
-            #     border_radius=10,
-            #     content=self.password
-            # ),
-            
+            Row(alignment='center', controls = [Text(value= 'Forgot your password?', weight='bold',size = 15, color='white')]),
+            Text(value= "Please, enter your email address below and we'l send you a link to reset your password", size = 12, color='white'),
+            Container(height = 2),
+            self.email_input,
             Container(
                 height = txf_height,
                 width = btn_width,
                 bgcolor= Dark_bgcolor,
                 border_radius = 10,
                 alignment= alignment.center,
-                content= Text(value='Continue', size = 14, color='white')
-            )
+                content= Text(value='Reset password', size = 14, color='white')
+            ),
+            Container(height = 1)
         ])
 
         self.content = Container(
