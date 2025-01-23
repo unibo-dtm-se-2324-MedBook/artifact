@@ -9,7 +9,11 @@ class FirstPage(Container):
         self.offset = transform.Offset(0,0,) # для Flet Offset может быть использован для представления смещения в двумерной системе координат
         
         # self.page = page
-        
+        self.email_input = None
+        self.first_content = None
+        self.content = None
+
+    def build(self):
         self.email_input = Container(
             height = txf_height,
             bgcolor= 'white',
@@ -32,7 +36,8 @@ class FirstPage(Container):
                 bgcolor= Dark_bgcolor,
                 border_radius = 10,
                 alignment= alignment.center,
-                content= Text(value='Continue', size = 14, color='white')
+                content= Text(value='Continue', size = 14, color='white'),
+                on_click= lambda _: self.page.go('/singup_page')
             ),
             Container(height = 2)
         ])

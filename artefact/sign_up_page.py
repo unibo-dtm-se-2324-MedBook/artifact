@@ -3,11 +3,10 @@ from utils.traits import *
 
 class SignUpPage(Container):
 
-    def __init__(self, page: Page):
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
-        self.page = page
         
         self.name = self.create_txtField('Name')
         self.surname = self.create_txtField('Surname')
@@ -69,12 +68,8 @@ class SignUpPage(Container):
                     Row(
                         spacing = 0,
                         controls = [
-                            Text(value= "I agree to", size = 12, color='white'
-                                    #  self.email,     
-                            ),
-                            Text(value= " Terms of Privacy Policy", size = 12, color='#FFFAFA', italic= True 
-                                    #  self.email,     
-                            )
+                            Text(value= "I agree to", size = 12, color='white'),
+                            Text(value= " Terms of Privacy Policy", size = 12, color='#FFFAFA', italic= True)
                         ]
                     )
                 ]
@@ -86,7 +81,8 @@ class SignUpPage(Container):
                 bgcolor= Dark_bgcolor,
                 border_radius = 10,
                 alignment= alignment.center,
-                content= Text(value='Agree and Continue', size = 14, color='white')
+                content= Text(value='Agree and Continue', size = 14, color='white'),
+                on_click= lambda _: self.page.go('/login_page')
             ),
             Container(height = 10)
         ])
@@ -110,7 +106,18 @@ class SignUpPage(Container):
                     height = base_height,
                     padding = padding.only(top = 20, left = 10, right = 10),
                     content= Column(controls=[
-                        Container(data = 'first_page', height = 30, content = IconButton(icon=Icons.KEYBOARD_RETURN, icon_size=17, icon_color='white', bgcolor=Dark_bgcolor, highlight_color ='#FFFAFA')),
+                        Container(
+                            data = 'first_page', 
+                            height = 30, 
+                            content = IconButton(
+                                icon=Icons.KEYBOARD_RETURN, 
+                                icon_size=17, 
+                                icon_color='white', 
+                                bgcolor=Dark_bgcolor, 
+                                highlight_color ='#FFFAFA',
+                                on_click= lambda _: self.page.go('/first_page')
+                            ),
+                        ),
                         Container(padding = 10, bgcolor = '#cc2d2b2c', border_radius = 10, content = self.sighup_content)
                     ])
                 )

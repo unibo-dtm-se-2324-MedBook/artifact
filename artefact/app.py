@@ -1,4 +1,5 @@
 from flet import *
+# from flet_route import Router, Route, RouteContext
 
 from utils.traits import *
 from first_page import FirstPage
@@ -29,31 +30,44 @@ class App(UserControl):
         self.page = page
         self.page.spacing = 0
 
-        # self.first_page = FirstPage(self.page)
         self.first_page = FirstPage()
+        self.login_page = LoginPage()
+        self.signup_page = SignUpPage()
+        self.main_page = MainPage()
+        self.forgpassw_page = ForgPasswPage()
+        
+        # self.screen_views = Stack( # Stack используется для наложения (или "накладывания") различных элементов друг на друга
+        #     expand = True,
+        #     controls=[
+        #         self.first_page,
+        #         # self.login_page,
+        #         # self.signup_page,  
+        #         # self.main_page, 
+        #         # self.forgpassw_page, 
+        #     ]
+        # )
 
-        self.login_page = LoginPage(self.page)
-        self.signup_page = SignUpPage(self.page)
-        self.main_page = MainPage(self.page)
-        self.forgpassw_page = ForgPasswPage(self.page)
-        
-        print(f"self.first_page content: {self.first_page}"),
-        
-        self.screen_views = Stack( # Stack используется для наложения (или "накладывания") различных элементов друг на друга
-            expand = True,
-            controls=[
-                self.first_page,
-                # self.login_page,
-                # self.signup_page,  
-                # self.main_page, 
-                # self.forgpassw_page, 
-            ]
-        )
-        
-        self.building()
+        page.on_route_change = self.route_change
+        page.go("/first_page")
+        # self.building()
     
-    def building(self):
-        self.page.add(WindowDrag(), self.screen_views)
-        # self.page.update()
+    # def building(self):
+    #     self.page.add(WindowDrag(), Stack(expand = True, controls=[self.first_page])) # self.screen_views)
+
+    def route_change(self, route):
+        self.page.controls.clear()
+
+        if self.page.route == "/first_page":
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.first_page]))
+        elif self.page.route == "/login_page":
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.login_page]))
+        elif self.page.route == "/passw_page":
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.forgpassw_page]))
+        elif self.page.route == "/singup_page":
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.signup_page]))
+        elif self.page.route == "/main_page":
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.main_page]))
+        
+        self.page.update()
 
 app(target = App, assets_dir= 'assets')

@@ -2,11 +2,11 @@ from flet import *
 from utils.traits import *
 
 class ForgPasswPage(Container):
-    def __init__(self, page: Page):
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
-        self.page = page
+        # self.page = page
 
         self.email_input = Container(
             height = txf_height,
@@ -30,7 +30,8 @@ class ForgPasswPage(Container):
                 bgcolor= Dark_bgcolor,
                 border_radius = 10,
                 alignment= alignment.center,
-                content= Text(value='Reset password', size = 14, color='white')
+                content= Text(value='Reset password', size = 14, color='white'),
+                on_click= lambda _: self.page.go('/login_page')
             ),
             Container(height = 1)
         ])
@@ -54,7 +55,18 @@ class ForgPasswPage(Container):
                     height = base_height,
                     padding = padding.only(top = 20, left = 10, right = 10),
                     content= Column(controls=[
-                        Container(data = 'first_page', height = 30, content = IconButton(icon=Icons.KEYBOARD_RETURN, icon_size=17, icon_color='white', bgcolor=Dark_bgcolor, highlight_color ='#FFFAFA')),
+                        Container(
+                            data = 'first_page', 
+                            height = 30, 
+                            content = IconButton(
+                                icon=Icons.KEYBOARD_RETURN, 
+                                icon_size=17, 
+                                icon_color='white', 
+                                bgcolor=Dark_bgcolor, 
+                                highlight_color ='#FFFAFA',
+                                on_click= lambda _: self.page.go('/first_page')
+                            )
+                        ),
                         Container(height=100),
                         Container(
                             padding = 10,

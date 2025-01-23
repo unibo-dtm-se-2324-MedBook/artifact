@@ -2,12 +2,19 @@ from flet import *
 from utils.traits import *
 
 class LoginPage(Container):
-    def __init__(self, page:Page):
+    # def __init__(self, page:Page):
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
-        self.page = page
+        # self.page = page
+        
+        self.view_passw = None
+        self.password = None
+        self.login_content = None
+        self.content = None
 
+    def build(self):
         self.view_passw = Text(value= 'View', color = Dark_bgcolor)
         self.password = TextField(
             password = True,
@@ -44,12 +51,13 @@ class LoginPage(Container):
                 bgcolor= Dark_bgcolor,
                 border_radius = 10,
                 alignment= alignment.center,
-                content= Text(value='Continue', size = 14, color='white')
+                content= Text(value='Continue', size = 14, color='white'),
+                on_click= lambda _: self.page.go('/main_page')
             ),
             Container(height = 3),
             Container(
                 content = Row(alignment='center', controls = [Text(value="Forgot your password?", color = 'white', size = 12)]),
-                on_click= lambda _: self.page.go('/forgot_passw')
+                on_click= lambda _: self.page.go('/passw_page')
             )
         ])
         
@@ -72,7 +80,18 @@ class LoginPage(Container):
                     height = base_height,
                     padding = padding.only(top = 20, left = 10, right = 10),
                     content= Column(controls=[
-                        Container(data = 'first_page', height = 30, content = IconButton(icon=Icons.KEYBOARD_RETURN, icon_size=17, icon_color='white', bgcolor=Dark_bgcolor, highlight_color ='#FFFAFA')),
+                        Container(
+                            data = 'first_page', 
+                            height = 30, 
+                            content = IconButton(
+                                icon=Icons.KEYBOARD_RETURN, 
+                                icon_size=17, 
+                                icon_color='white', 
+                                bgcolor=Dark_bgcolor, 
+                                highlight_color ='#FFFAFA',
+                                on_click= lambda _: self.page.go('/first_page')
+                            ),
+                        ),
                         Container(height=100),
                         Container(
                             padding = 10,
