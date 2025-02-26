@@ -1,5 +1,6 @@
 from flet import *
 from utils.traits import *
+from utils.validation import Validator
 
 class SignUpPage(Container):
 
@@ -8,6 +9,9 @@ class SignUpPage(Container):
         self.expand = True
         self.offset = transform.Offset(0,0,)
         
+        self.validator = Validator()
+        self.error_border = 'red'
+
         self.name = self.create_txtField('Name')
         self.surname = self.create_txtField('Surname')
         self.email =  self.create_txtField('Email') 
@@ -27,12 +31,8 @@ class SignUpPage(Container):
             Column(
                 spacing = 0,
                 controls=[
-                    Text(value= "Seems you don't have account.", size = 12, color='white'
-                            #  self.name + ' ' + self.surname,     
-                    ),
-                    Text(value= "Let's get you signed up!", size = 12, color='white'
-                            #  self.email,     
-                    ),
+                    Text(value= "Seems you don't have account.", size = 12, color='white'),
+                    Text(value= "Let's get you signed up!", size = 12, color='white'),
                 ]
             ),
 
@@ -82,6 +82,7 @@ class SignUpPage(Container):
                 border_radius = 10,
                 alignment= alignment.center,
                 content= Text(value='Agree and Continue', size = 14, color='white'),
+                #on_click=self.signup
                 on_click= lambda _: self.page.go('/login_page')
             ),
             Container(height = 10)
@@ -140,3 +141,26 @@ class SignUpPage(Container):
             self.view_passw.value = 'View'
         self.password.update()
         self.view_passw.update()
+
+
+    def signup(self, e):
+        if not self.validator.name_correctness(self.name.value):
+            self.name.border_color = self.error_border
+            self.name.update()
+        if not self.validator.surname_correctness(self.surname.value):
+            self.surname.border_color = self.error_border
+            self.surname.update()
+        if not self.validator.email_correctness(self.email.value):
+            self.email.border_color = self.error_border
+            self.email.update()
+        if not self.validator.password_correctness(self.password.value):
+            self.password.border_color = self.error_border
+            self.password.update()
+        else:
+            name = self.name.value
+            surname = self.surname.value
+            email = self.email.value
+            password = self.password.value
+
+            print(name, surname, email, password)
+            
