@@ -1,5 +1,6 @@
 from flet import *
 from utils.traits import *
+from utils.validation import Validator
 
 class ForgPasswPage(Container):
     def __init__(self):
@@ -8,6 +9,9 @@ class ForgPasswPage(Container):
         self.offset = transform.Offset(0,0,)
         # self.page = page
 
+        self.validator = Validator()
+        self.error_border = 'red'
+        
         self.email_input = Container(
             height = txf_height,
             bgcolor= 'white',
@@ -78,3 +82,10 @@ class ForgPasswPage(Container):
                 )
             ])
         )
+    
+
+    def reset_password(self, e):
+        if not self.validator.email_correctness(self.email.value):
+            self.email.border_color = self.error_border
+            self.email.update()
+        
