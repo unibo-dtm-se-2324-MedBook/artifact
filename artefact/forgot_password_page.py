@@ -35,8 +35,10 @@ class ForgPasswPage(Container):
                 border_radius = 10,
                 alignment= alignment.center,
                 content= Text(value='Reset password', size = 14, color='white'),
-                on_click= lambda _: self.page.go('/login_page')
+                on_click = lambda _: self.page.go('/login_page')
+                # on_click = self.reset_password
             ),
+
             Container(height = 1)
         ])
 
