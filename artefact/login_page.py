@@ -1,5 +1,7 @@
 from flet import *
 from utils.traits import *
+from utils.validation import Validator
+
 
 class LoginPage(Container):
     # def __init__(self, page:Page):
@@ -9,6 +11,9 @@ class LoginPage(Container):
         self.offset = transform.Offset(0,0,)
         # self.page = page
         
+        self.validator = Validator()
+        self.error_border = 'red'
+
         self.view_passw = None
         self.password = None
         self.login_content = None
@@ -53,6 +58,7 @@ class LoginPage(Container):
                 alignment= alignment.center,
                 content= Text(value='Continue', size = 14, color='white'),
                 on_click= lambda _: self.page.go('/main_page')
+                #on_click = self.continuing
             ),
             Container(height = 3),
             Container(
@@ -114,5 +120,12 @@ class LoginPage(Container):
             self.view_passw.value = 'View'
         self.password.update()
         self.view_passw.update()
+    
+    def continuing(self, e):
+        if not self.validator.password_correctness(self.password.value):
+            self.password.border_color = self.error_border
+            self.password.update()
+        else:
+            password = self.password.value
 
     
