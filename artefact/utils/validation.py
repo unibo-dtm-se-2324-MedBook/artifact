@@ -23,7 +23,7 @@ class Validator():
         return True
         
     def email_correctness(self, email):
-        pattern = r'^[a-zA-Z0-9_.+-] + @[a-zA-Z0-9-] + .[a-zA-Z0-9-.] + $'
+        pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
         return re.match(pattern, email) is not None
     
     def password_correctness(self, password):
