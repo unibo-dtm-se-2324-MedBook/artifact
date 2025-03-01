@@ -1,7 +1,7 @@
 from flet import *
 from utils.traits import *
 from utils.validation import Validator
-
+from service.authentication import login_user, store_token
 
 class LoginPage(Container):
     # def __init__(self, page:Page):
@@ -10,7 +10,7 @@ class LoginPage(Container):
         self.expand = True
         self.offset = transform.Offset(0,0,)
         # self.page = page
-        
+
         self.validator = Validator()
         self.error_border = 'red'
 
@@ -38,9 +38,7 @@ class LoginPage(Container):
                     Text(value= 'Anastasiia Bakhmutova', weight='bold', size = 12, color='white'
                             #  self.name + ' ' + self.surname, 
                     ),
-                    Text(value= 'bakh@mail.com', size = 12, color='white'
-                            #  self.email, 
-                    ),
+                    Text(value = 'self.email', size = 12, color='white'),
                 ]
             ),
             Container(
@@ -57,8 +55,8 @@ class LoginPage(Container):
                 border_radius = 10,
                 alignment= alignment.center,
                 content= Text(value='Continue', size = 14, color='white'),
-                on_click= lambda _: self.page.go('/main_page')
-                #on_click = self.continuing
+                # on_click= lambda _: self.page.go('/main_page')
+                on_click = self.continuing
             ),
             Container(height = 3),
             Container(
@@ -126,6 +124,22 @@ class LoginPage(Container):
             self.password.border_color = self.error_border
             self.password.update()
         else:
+            email = self.email.value
             password = self.password.value
+
+            self.page.splash = ProgressBar()
+            self.page.update()
+
+            token = login_user(email, password)
+            self.page.splash = None
+            self.page.update()
+
+            if token:
+                store_token(token)
+                self.page.go('/main_page')
+            else:
+                self.page.snack_bar = SnackBar(Text('Invalid password'))
+                self.page.snack_bar.open = True
+                self.page.update()
 
     
