@@ -1,5 +1,7 @@
 from flet import *
 from utils.traits import *
+from utils.validation import Validator
+from service.authentication import check_email
 
 class FirstPage(Container):
     # def __init__(self, page:Page):
@@ -8,28 +10,31 @@ class FirstPage(Container):
         self.expand = True # атрибут expand может управлять тем, как элемент будет расширяться или сжиматься в пределах контейнера. в библиотеке Flet атрибут expand может использоваться, чтобы заставить элемент (например, кнопку или текстовое поле) занимать все доступное пространство в родительском контейнере.        
         self.offset = transform.Offset(0,0,) # для Flet Offset может быть использован для представления смещения в двумерной системе координат
         
+        self.validator = Validator()
+        self.error_border = 'red'
+
         # self.page = page
-        self.email_input = None
+        self.email = None
         self.first_content = None
         self.content = None
 
     def build(self):
-        self.email_input = Container(
-            height = txf_height,
-            bgcolor= 'white',
-            border_radius = 10,
-            content = TextField(
-                hint_text='Email',
-                hint_style=TextStyle(size = 12, color = input_hint_color),
-                text_style= TextStyle(size = 12, color = input_hint_color),
-            )
-        )
+        self.email = TextField(
+            hint_text = 'Email',
+            hint_style = TextStyle(size = 12, color = input_hint_color),
+            text_style = TextStyle(size = 12, color = input_hint_color))
         
         self.first_content = Column(controls = [
             Row(alignment='center', controls = [Text(value= 'MedBook', weight='bold',size = 20, color='white')]),
             Text(value= 'Health in a convenient format', weight='bold', size = 12, color='white'),
             Container(height = 3),
-            self.email_input,
+            # self.email_input,
+            Container(
+                height=txf_height,
+                bgcolor='white',
+                border_radius=10,
+                content=self.email
+            ),
             Container(
                 height = txf_height,
                 width = btn_width,
@@ -37,7 +42,8 @@ class FirstPage(Container):
                 border_radius = 10,
                 alignment= alignment.center,
                 content= Text(value='Continue', size = 14, color='white'),
-                on_click= lambda _: self.page.go('/singup_page')
+                # on_click= lambda _: self.page.go('/singup_page')
+                on_click = self.but_continue
             ),
             Container(height = 2)
         ])
@@ -72,3 +78,18 @@ class FirstPage(Container):
                 ),
             ])
         )
+    
+    def but_continue(self, e):
+        if not self.validator.email_correctness(self.email.value):
+            self.email.border_color = self.error_border
+            self.email.update()
+        else:
+            email_input = self.email.value
+            # self.page.splash = ProgressBar()
+            # self.page.update()
+            email = check_email(email_input)
+            if email:
+                self.page.go('/login_page', {"email": email})
+            else:
+                self.page.go('/singup_page')
+            
