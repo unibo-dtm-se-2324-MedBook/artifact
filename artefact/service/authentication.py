@@ -14,7 +14,8 @@ credential = credentials.Certificate(SERVICE_ACCOUNT_FILE)
 firebase_admin.initialize_app(credential)
 
 FIREBASE_CONFIG_FILE = os.environ.get("FIREBASE_CONFIG_FILE", ".secrets/firebase.json")
-firebaseConfig = json.load(FIREBASE_CONFIG_FILE)
+with open(FIREBASE_CONFIG_FILE) as f:
+  firebaseConfig = json.load(f)
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
@@ -24,8 +25,8 @@ DB_EMAIL = os.environ.get("DB_EMAIL")
 DB_USERNAME = os.environ.get("DB_USERNAME")
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 
-if not all([DB_EMAIL, DB_PASSWORD, DB_USERNAME]):
-    raise Exception("Some DB_ envrionment variable is unset")
+# if not all([DB_EMAIL, DB_PASSWORD, DB_USERNAME]):
+#     raise Exception("Some DB_ envrionment variable is unset")
 
 # firebase_auth.create_user(
 #     email=DB_EMAIL,
