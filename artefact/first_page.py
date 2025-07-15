@@ -94,5 +94,6 @@ class FirstPage(Container):
                 self.main.temp_email = self.email.value
                 self.page.go('/login_page')
             else:
-                self.page.go('/singup_page')
+                self.main.temp_email = self.email.value
+                self.page.go('/signup_page')
             

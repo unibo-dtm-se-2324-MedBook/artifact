@@ -69,8 +69,11 @@ class App(UserControl):
                 self.temp_email = ''
         elif self.page.route == "/passw_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.forgpassw_page]))
-        elif self.page.route == "/singup_page":
+        elif self.page.route == "/signup_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.signup_page]))
+            if self.temp_email:
+                self.signup_page.set_email(self.temp_email)
+                self.temp_email = ''
         elif self.page.route == "/main_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.main_page]))
         

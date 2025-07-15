@@ -29,6 +29,13 @@ class SignUpPage(Container):
             hint_style = TextStyle(size = 12, color = input_hint_color),
             text_style = TextStyle( size = 12, color = input_hint_color))
 
+        self.content = None
+
+    def set_email(self, email):
+        self.email.value = email
+        self.email.update()
+
+    def build(self):     
         self.sighup_content = Column(controls = [
             Row(alignment='center', controls = [Text(value= 'Sigh Up', weight='bold',size = 12, color='white')]),
             Column(
@@ -128,12 +135,14 @@ class SignUpPage(Container):
             ])
         )
 
+        return self.content
+
     def create_txtField(self, hint_name):
         return TextField(
             hint_text = hint_name,
             hint_style = TextStyle(size = 12, color = input_hint_color),
             text_style = TextStyle(size = 12, color = input_hint_color),
-            text_align=TextAlign.LEFT)
+            text_align = TextAlign.LEFT)
 
     def show_hide_passw(self, e):
         status = self.password.password
