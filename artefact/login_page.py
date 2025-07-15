@@ -14,11 +14,22 @@ class LoginPage(Container):
         self.validator = Validator()
         self.error_border = 'red'
 
+        #
+        self.email = ""
+        self.text_email = Text()
+
         self.view_passw = None
         self.password = None
         self.login_content = None
         self.content = None
 
+    #
+    def set_email(self, email):
+        self.email = email
+        self.text_email.value = f"Email: {email}"
+        self.update()
+    
+    
     def build(self):
         self.view_passw = Text(value= 'View', color = Dark_bgcolor)
         self.password = TextField(
@@ -38,7 +49,8 @@ class LoginPage(Container):
                     Text(value= 'Anastasiia Bakhmutova', weight='bold', size = 12, color='white'
                             #  self.name + ' ' + self.surname, 
                     ),
-                    Text(value = 'self.email', size = 12, color='white'),
+                    #
+                    Text(value = self.text_email.value, size = 12, color='white'),
                 ]
             ),
             Container(
@@ -124,7 +136,7 @@ class LoginPage(Container):
             self.password.border_color = self.error_border
             self.password.update()
         else:
-            email = self.email.value
+            email = self.email
             password = self.password.value
 
             self.page.splash = ProgressBar()

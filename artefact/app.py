@@ -30,12 +30,15 @@ class App(UserControl):
         self.page = page
         self.page.spacing = 0
 
-        self.first_page = FirstPage()
+        self.first_page = FirstPage(self)
         self.login_page = LoginPage()
-        self.signup_page = SignUpPage()
+        self.signup_page = SignUpPage(self)
         self.main_page = MainPage()
         self.forgpassw_page = ForgPasswPage()
+
+        self.temp_email = '' # temporary email storage
         
+
         # self.screen_views = Stack( # Stack используется для наложения (или "накладывания") различных элементов друг на друга
         #     expand = True,
         #     controls=[
@@ -61,6 +64,9 @@ class App(UserControl):
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.first_page]))
         elif self.page.route == "/login_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.login_page]))
+            if self.temp_email:
+                self.login_page.set_email(self.temp_email)
+                self.temp_email = ''
         elif self.page.route == "/passw_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.forgpassw_page]))
         elif self.page.route == "/singup_page":

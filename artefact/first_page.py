@@ -5,11 +5,13 @@ from service.authentication import check_email
 
 class FirstPage(Container):
     # def __init__(self, page:Page):
-    def __init__(self):
+    def __init__(self, main):
         super().__init__()
         self.expand = True # атрибут expand может управлять тем, как элемент будет расширяться или сжиматься в пределах контейнера. в библиотеке Flet атрибут expand может использоваться, чтобы заставить элемент (например, кнопку или текстовое поле) занимать все доступное пространство в родительском контейнере.        
         self.offset = transform.Offset(0,0,) # для Flet Offset может быть использован для представления смещения в двумерной системе координат
         
+        self.main = main
+
         self.validator = Validator()
         self.error_border = 'red'
 
@@ -87,9 +89,10 @@ class FirstPage(Container):
             email_input = self.email.value
             # self.page.splash = ProgressBar()
             # self.page.update()
-            email = check_email(email_input)
-            if email:
-                self.page.go('/login_page', {"email": email})
+            email_exist = check_email(email_input)
+            if email_exist:
+                self.main.temp_email = self.email.value
+                self.page.go('/login_page')
             else:
                 self.page.go('/singup_page')
             

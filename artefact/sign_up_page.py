@@ -1,14 +1,17 @@
 from flet import *
 from utils.traits import *
 from utils.validation import Validator
+from service.authentication import create_user
 
 class SignUpPage(Container):
 
-    def __init__(self):
+    def __init__(self, main):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
         
+        self.main = main  # save the reference to the main class (class App)
+
         self.validator = Validator()
         self.error_border = 'red'
 
@@ -82,8 +85,8 @@ class SignUpPage(Container):
                 border_radius = 10,
                 alignment= alignment.center,
                 content= Text(value='Agree and Continue', size = 14, color='white'),
-                #on_click=self.signup
-                on_click= lambda _: self.page.go('/login_page')
+                on_click=self.signup
+                # on_click= lambda _: self.page.go('/login_page')
             ),
             Container(height = 10)
         ])
@@ -129,7 +132,8 @@ class SignUpPage(Container):
         return TextField(
             hint_text = hint_name,
             hint_style = TextStyle(size = 12, color = input_hint_color),
-            text_style = TextStyle(size = 12, color = input_hint_color))
+            text_style = TextStyle(size = 12, color = input_hint_color),
+            text_align=TextAlign.LEFT)
 
     def show_hide_passw(self, e):
         status = self.password.password
@@ -163,4 +167,8 @@ class SignUpPage(Container):
             password = self.password.value
 
             print(name, surname, email, password)
+
+            create_user(name, surname, email, password)
+            self.main.temp_email = self.email.value
+            self.page.go("/login_page")
             
