@@ -2,6 +2,7 @@ from flet import *
 from utils.traits import *
 from utils.validation import Validator
 from service.authentication import login_user, store_token
+from firebase_admin import auth as firebase_auth
 
 class LoginPage(Container):
     # def __init__(self, page:Page):
@@ -14,21 +15,20 @@ class LoginPage(Container):
         self.validator = Validator()
         self.error_border = 'red'
 
-        #
-        self.email = ""
-        self.text_email = Text()
+        self.email = ''
+        self.text_email = Text(size = 12, color = 'white')
 
         self.view_passw = None
         self.password = None
         self.login_content = None
         self.content = None
 
-    #
     def set_email(self, email):
         self.email = email
-        self.text_email.value = f"Email: {email}"
+
+        self.text_email.value = f'Email: {self.email}'
+
         self.update()
-    
     
     def build(self):
         self.view_passw = Text(value= 'View', color = Dark_bgcolor)
@@ -46,11 +46,8 @@ class LoginPage(Container):
             Column(
                 spacing = 0,
                 controls=[
-                    Text(value= 'Anastasiia Bakhmutova', weight='bold', size = 12, color='white'
-                            #  self.name + ' ' + self.surname, 
-                    ),
-                    #
-                    Text(value = self.text_email.value, size = 12, color='white'),
+                    Text(value= 'Nice to see you again!', weight='bold', size = 12, color='white'),
+                    self.text_email
                 ]
             ),
             Container(
