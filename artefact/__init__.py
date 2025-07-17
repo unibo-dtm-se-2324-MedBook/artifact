@@ -2,11 +2,11 @@ from flet import *
 # from flet_route import Router, Route, RouteContext
 
 from utils.traits import *
-from first_page import FirstPage
-from login_page import LoginPage
-from sign_up_page import SignUpPage
-from main_page import MainPage
-from forgot_password_page import ForgPasswPage
+from ui.gui.first_page import FirstPage
+from ui.gui.login_page import LoginPage
+from ui.gui.sign_up_page import SignUpPage
+from ui.gui.main_page import MainPage
+from ui.gui.forgot_password_page import ForgPasswPage
 
 class WindowDrag(UserControl):
     def __init__(self):
