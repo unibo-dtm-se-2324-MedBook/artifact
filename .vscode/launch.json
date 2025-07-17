@@ -8,7 +8,7 @@
             "name": "Run app",
             "type": "debugpy",
             "request": "launch",
-            "program": "artefact/app.py",
+            "program": "artefact/__init__.py",
             "console": "integratedTerminal",
             "env": {
                 
