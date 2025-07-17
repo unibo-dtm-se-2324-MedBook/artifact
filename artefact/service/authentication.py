@@ -45,12 +45,11 @@ def create_user(name, surname, email, password):
 
 def check_email(email):
   try:
-    pos_user = firebase_auth.get_user_by_email(email)
-    print('Successfully fetched user data: {0}'.format(pos_user.uid))
-    print(type(pos_user.email))
-    return pos_user.email
+    user_uid = firebase_auth.get_user_by_email(email)
+    print('Successfully fetched user data: {0}'.format(user_uid.uid))
+    return user_uid.email
   except UserNotFoundError:
-    print('email False')
+    print("Email wasn't found")
     return False 
   except Exception as e:
     print(f"Other mistake: {e}")
@@ -70,8 +69,16 @@ def store_token(token):
   with open('token.pickle', 'wb') as f: # Write + Binary mode
     pickle.dump(token, f) #  to store the object data to the file
 
+# Get user info from token (token.pickle)
+def get_user_info(token):
+    decoded_token = firebase_auth.verify_id_token(token)
+    # uid = decoded_token['uid']
+    # email = decoded_token.get('email')
+    name = decoded_token.get('name') or "User"
+    # return uid, email, name
+    return name
+
 # Exit the account
 def log_out(token):
   if os.path.exists('token.pickle'):
     os.remove('token.pickle')
-
