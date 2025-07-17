@@ -2,15 +2,16 @@ from flet import *
 from utils.traits import *
 from utils.validation import Validator
 from service.authentication import login_user, store_token
-from firebase_admin import auth as firebase_auth
 
 class LoginPage(Container):
     # def __init__(self, page:Page):
-    def __init__(self):
+    def __init__(self, main):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
         # self.page = page
+
+        self.main = main
 
         self.validator = Validator()
         self.error_border = 'red'
@@ -145,6 +146,8 @@ class LoginPage(Container):
 
             if token:
                 store_token(token)
+                self.main.token = token
+                # print(token)
                 self.page.go('/main_page')
             else:
                 self.page.snack_bar = SnackBar(Text('Invalid password'))

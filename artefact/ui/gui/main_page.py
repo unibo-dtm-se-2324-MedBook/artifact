@@ -1,5 +1,6 @@
 from flet import *
 from utils.traits import *
+from service.authentication import log_out
 
 class MainPage(Container):
 
@@ -7,7 +8,14 @@ class MainPage(Container):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
+        
+        self.token = ''
 
+    def set_token(self, token):
+        self.token = token
+        self.update()
+
+    def build(self):
         days_card = Row(scroll = 'auto')
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         for day in days:
@@ -38,7 +46,7 @@ class MainPage(Container):
                 Container(height=10),
                 Row(controls=[
                     TextButton(
-                        on_click=self.go_to_page,
+                        # on_click = self.page.go('/main_page'),
                         content = Row(controls = [
                             Icon(icons.SCHEDULE, color="white60"),
                             Text(value="Schedule",
@@ -54,7 +62,7 @@ class MainPage(Container):
                 Container(height=5),
                 Row(controls=[
                     TextButton(
-                        on_click= self.go_to_page,
+                        # on_click= self.go_to_page,
                         content = Row(controls = [
                             Icon(icons.EDIT_DOCUMENT, color="white60"),
                             Text("Documents",
@@ -70,7 +78,7 @@ class MainPage(Container):
                 Container(height=5),
                 Row(controls=[
                     TextButton(
-                        on_click= self.go_to_page,
+                        # on_click= self.go_to_page,
                         content = Row(controls = [
                             Icon(icons.DOCUMENT_SCANNER, color="white60"),
                             Text("Check",
@@ -86,7 +94,7 @@ class MainPage(Container):
                 Container(height=5),
                 Row(controls=[
                     TextButton(
-                        on_click= self.go_to_page,
+                        # on_click= self.go_to_page,
                         content = Row(controls = [
                             Icon(icons.PERSON_OUTLINE, color="white60"),
                             Text(value="Personal info",
@@ -102,7 +110,6 @@ class MainPage(Container):
                 Container(height=20),
                 Row(controls=[
                     TextButton(
-                        on_click= lambda _: self.page.go('/first_page'),
                         content = Row(controls = [
                             Icon(icons.EXIT_TO_APP, color="white60"),
                             Text("Exit",
@@ -110,8 +117,10 @@ class MainPage(Container):
                                 weight=FontWeight.W_300,
                                 color="white",
                                 font_family="poppins"
-                            )
-                        ])
+                            ) 
+                        ]),
+                        on_click = self.exit
+                        # on_click= lambda _: self.page.go('/first_page'),
                     )
                 ])
             ])
@@ -189,9 +198,17 @@ class MainPage(Container):
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
 
-
-    #############
-    def go_to_page(self, e):
-            pass
+    def exit(self, e):
+        token = self.token
+        if token: 
+            log_out(token)
+            self.page.session.clear()
+            self.page.go('/first_page')
+        else:
+            self.page.snack_bar = SnackBar(Text('Something is wrong, try again'))
+            self.page.snack_bar.open = True
+            self.page.update() 
+            
+        
 
 

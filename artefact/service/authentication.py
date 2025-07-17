@@ -21,9 +21,9 @@ firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
 
 # Check
-DB_EMAIL = os.environ.get("DB_EMAIL")
-DB_USERNAME = os.environ.get("DB_USERNAME")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
+# DB_EMAIL = os.environ.get("DB_EMAIL")
+# DB_USERNAME = os.environ.get("DB_USERNAME")
+# DB_PASSWORD = os.environ.get("DB_PASSWORD")
 
 # if not all([DB_EMAIL, DB_PASSWORD, DB_USERNAME]):
 #     raise Exception("Some DB_ envrionment variable is unset")
@@ -71,8 +71,7 @@ def store_token(token):
     pickle.dump(token, f) #  to store the object data to the file
 
 # Exit the account
-def revoke_token(token):
-  firebase_auth.revoke_refresh_tokens(token)
+def log_out(token):
   if os.path.exists('token.pickle'):
     os.remove('token.pickle')
 

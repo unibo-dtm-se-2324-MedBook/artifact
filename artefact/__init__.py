@@ -31,13 +31,13 @@ class App(UserControl):
         self.page.spacing = 0
 
         self.first_page = FirstPage(self)
-        self.login_page = LoginPage()
+        self.login_page = LoginPage(self)
         self.signup_page = SignUpPage(self)
         self.main_page = MainPage()
         self.forgpassw_page = ForgPasswPage()
 
         self.temp_email = '' # temporary email storage
-        
+        self.token = ''
 
         # self.screen_views = Stack( # Stack используется для наложения (или "накладывания") различных элементов друг на друга
         #     expand = True,
@@ -76,6 +76,9 @@ class App(UserControl):
                 self.temp_email = ''
         elif self.page.route == "/main_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.main_page]))
+            if self.token:
+                self.main_page.set_token(self.token)
+                self.set_token = ''
         
         self.page.update()
 
