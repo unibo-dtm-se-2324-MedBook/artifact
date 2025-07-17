@@ -46,7 +46,7 @@ class MainPage(Container):
                 Container(height=10),
                 Row(controls=[
                     TextButton(
-                        # on_click = self.page.go('/main_page'),
+                        on_click = self.restore,
                         content = Row(controls = [
                             Icon(icons.SCHEDULE, color="white60"),
                             Text(value="Schedule",
