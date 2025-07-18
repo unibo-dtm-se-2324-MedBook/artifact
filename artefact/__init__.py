@@ -51,7 +51,8 @@ class App(UserControl):
         # )
 
         page.on_route_change = self.route_change
-        page.go("/first_page")
+        # page.go("/first_page")
+        page.go("/main_page")
         # self.building()
     
     # def building(self):
