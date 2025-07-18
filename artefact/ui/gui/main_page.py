@@ -1,6 +1,8 @@
 from flet import *
 from utils.traits import *
 from service.authentication import log_out
+import calendar
+from datetime import datetime
 
 class MainPage(Container):
 
@@ -11,25 +13,30 @@ class MainPage(Container):
         
         self.token = ''
 
+        self.today = datetime.today()
+        self.year = self.today.year
+        self.month = self.today.month
+
     def set_token(self, token):
         self.token = token
         self.update()
 
     def build(self):
-        days_card = Row(scroll = 'auto')
-        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-        for day in days:
-            days_card.controls.append(
-                Container(
-                    bgcolor = '#3F888F',
-                    width = 80,
-                    height = 40,
-                    border_radius = 15,
-                    padding = 10,
-                    content = Text(day, color = '#FFFAFA', text_align = 'center')
-                )
-            )
+        # days_card = Row(scroll = 'auto')
+        # days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        # for day in days:
+        #     days_card.controls.append(
+        #         Container(
+        #             bgcolor = '#3F888F',
+        #             width = 80,
+        #             height = 40,
+        #             border_radius = 15,
+        #             padding = 10,
+        #             content = Text(day, color = '#FFFAFA', text_align = 'center')
+        #         )
+        #     )
 
+        # Creating a visual for navigation
         self.navig = Container(
             bgcolor = Dark_bgcolor,
             border_radius= b_radius,
@@ -126,6 +133,17 @@ class MainPage(Container):
             ])
         )
 
+        # Creating a visual for Schedule page
+        ## Calendar
+        self.prev_btn = IconButton(icons.ARROW_BACK, on_click = self.prev_month)
+        self.month_header = Text()
+        self.next_btn = IconButton(icons.ARROW_FORWARD, on_click = self.next_month)
+        self.grid = GridView(max_extent = 80, spacing = 5, run_spacing = 5)
+
+        ## Button to add new pill
+        
+
+        ## Combine
         schedule_content = Container(
             content = Column(
                 controls=[
@@ -135,69 +153,95 @@ class MainPage(Container):
                             Container(
                                 on_click= self.shrink,
                                 content = Icon(icons.MENU, Colors.BLACK)),
-                            Text(value = "MedBook", weight = FontWeight.BOLD, color = 'black'),
-                            Container(padding= padding.only(right = 16), content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK))
+                            Text(value = 'MedBook', weight = FontWeight.BOLD, color = 'black'),
+                            Container(
+                                # padding= padding.only(right = 16), 
+                                content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK))
                         ]
                     ),
-                    Row(
-                        alignment="center",
-                        controls=[Text(value = "Schedule")]
+                    Row(alignment = MainAxisAlignment.CENTER,
+                        controls = [Text('Schedule', size = 16)]),
+                    Row(alignment = 'spaceBetween', #alignment = MainAxisAlignment.CENTER
+                        controls = [self.prev_btn, self.month_header, self.next_btn],
                     ),
-                    #Container(height = 10),
-                    #Row(
-                        #alignment = 'center',
-                        #controls = [
-                            #FilledButton("Add new pills", icon="add", bgcolor = '#3F888F', on_click = lambda _: page.go('/add_pills'))
-                        #]
-                    #),
-                    #Container(height = 5),
-                    Text(value = "DAYS"),
-                    Container(
-                        padding = padding.only(bottom = 20, right= 16),
-                        content = days_card
-                    ),
-                    Container(height = 10),
+                    self.grid,
+                    Divider(),
+                    # self.add_pill - button to add pills
                 ]
             )
         )
+        # self.create_calendar()
 
-        self.schedule = content = Row(
+        # Schedule page with animation characteristics
+        self.schedule = Row(
             alignment='end',
             controls=[Container(
                 width = base_width, 
                 height = base_height, 
                 bgcolor = Light_bgcolor,
-                border_radius= b_radius,
+                border_radius = b_radius,
                 animate = animation.Animation(600, AnimationCurve.DECELERATE),
-                animate_scale=animation.Animation(400, curve="decelerate"),
-                padding = padding.only(top=15, left=20, right=20, bottom=5),
-                content = Column(controls=[schedule_content])
+                animate_scale = animation.Animation(400, curve = 'decelerate'),
+                padding = padding.only(top = 15, left = 20, right = 40, bottom = 5),
+                # clip_behavior=ClipBehavior.ANTI_ALIAS,
+                content = schedule_content
+                # content = Column(controls = [schedule_content])
             )]
         )
 
+        # Whole Main page (navigation + schedule)
         self.content = Container(
             width = base_width, 
             height = base_height, 
             bgcolor = Light_bgcolor,
-            border_radius= b_radius,
+            border_radius = b_radius,
             expand = True,
-            content=Stack(
-                controls=[self.navig, self.schedule]
+            content = Stack(
+                controls = [self.navig, self.schedule]
             )
         )
     
+    # Open navigation moving the schedule to the right
     def shrink(self, e):
         self.schedule.controls[0].width = 70
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
         self.schedule.update()
 
+    # Close navigation opening the schedule
     def restore(self, e):
         self.schedule.controls[0].width = base_width
         self.schedule.controls[0].border_radius = b_radius
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
 
+    # Generate calendar
+    def create_calendar(self):
+        self.grid.controls.clear()
+        
+        self.month_header.value = f'{calendar.month_name[self.month]} {self.year}'
+        first_wday, total_days = calendar.monthrange(self.year, self.month)
+        for _ in range(first_wday): # empty cells before the first day
+            self.grid.controls.append(Container())
+
+        self.update()
+
+    # Functions to go one month forward or back
+    def prev_month(self, e):
+        if self.month == 1:
+            self.month, self.year = 12, self.year - 1
+        else:
+            self.month -= 1
+        # self.create_calendar()
+
+    def next_month(self, e):
+        if self.month == 12:
+            self.month, self.year = 1, self.year + 1
+        else:
+            self.month += 1
+        # self.create_calendar()
+
+    # Function of exit clicking the "Exit" button
     def exit(self, e):
         token = self.token
         if token: 
