@@ -142,14 +142,13 @@ class MainPage(Container):
 
         ## Area to add new pill
         self.btn_add = ElevatedButton(
-            content = Text("Add the pill", size = 14, color = Colors.WHITE),
+            content = Text('Add the pill', size = 14, color = Colors.WHITE),
             height = txf_height,
             width = btn_width,
             bgcolor = Dark_bgcolor,
-            style = ButtonStyle(
-                shape = RoundedRectangleBorder(radius=10))
-            # on_click = self.show_form
-            )
+            style = ButtonStyle(shape = RoundedRectangleBorder(radius=10)),
+            on_click = self.show_form
+        )
         self.form = None
 
         ## Combine
@@ -249,6 +248,66 @@ class MainPage(Container):
         else:
             self.month += 1
         # self.create_calendar()
+    
+    # Creating the form for new medicine
+    def show_form(self, e):
+        def create_TextField():
+            return TextField(
+                text_style = TextStyle(size = 12, color = input_hint_color),
+                text_align = TextAlign.LEFT,
+                height = txf_height,
+                bgcolor = Colors.WHITE,
+                border_radius = 10,
+            )
+        self.medname_field = create_TextField()
+        self.qty_field = create_TextField()
+        self.date_picker = DatePicker(value = self.today)
+        self.time_picker = TimePicker(value = self.today.time())
+        self.note_field = create_TextField()
+
+        self.form = AlertDialog(
+            # title = Text('New pills'),
+            content = Column(
+                controls = [
+                    Text('Medication name:', size = general_txt_size),
+                    self.medname_field,
+                    Text('Quantity of pill:', size = general_txt_size),
+                    self.qty_field,
+                    Text('Date to take pills:', size = general_txt_size),
+                    self.date_picker,
+                    # Text('Time to take pills', size = general_txt_size),
+                    # self.time_picker,
+                    Text('Note:', size = general_txt_size),
+                    self.note_field
+                ], 
+                tight = True
+            ),
+            actions = [
+                TextButton(
+                    content=Text('Cancel', size = general_txt_size, color = Colors.WHITE),
+                    height = txf_height,
+                    style = ButtonStyle(
+                        shape = RoundedRectangleBorder(radius=10),
+                        bgcolor = Dark_bgcolor,
+                    ),
+                    # on_click = lambda e: self.close_form()
+                ),
+                TextButton(
+                    content=Text('Save', size = general_txt_size, color = Colors.WHITE),
+                    height = txf_height,
+                    style = ButtonStyle(
+                        shape = RoundedRectangleBorder(radius=10),
+                        bgcolor = Dark_bgcolor,
+                    ),
+                    # on_click = lambda e: self.save_pill()
+                ),
+            ],
+            modal = True,
+        )
+
+        self.page.dialog = self.form
+        self.form.open = True
+        self.page.update()
 
     # Function of exit clicking the "Exit" button
     def exit(self, e):
