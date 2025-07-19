@@ -140,8 +140,17 @@ class MainPage(Container):
         self.next_btn = IconButton(icons.ARROW_FORWARD, on_click = self.next_month)
         self.grid = GridView(max_extent = 80, spacing = 5, run_spacing = 5)
 
-        ## Button to add new pill
-        
+        ## Area to add new pill
+        self.btn_add = ElevatedButton(
+            content = Text("Add the pill", size = 14, color = Colors.WHITE),
+            height = txf_height,
+            width = btn_width,
+            bgcolor = Dark_bgcolor,
+            style = ButtonStyle(
+                shape = RoundedRectangleBorder(radius=10))
+            # on_click = self.show_form
+            )
+        self.form = None
 
         ## Combine
         schedule_content = Container(
@@ -166,7 +175,7 @@ class MainPage(Container):
                     ),
                     self.grid,
                     Divider(),
-                    # self.add_pill - button to add pills
+                    self.btn_add
                 ]
             )
         )
