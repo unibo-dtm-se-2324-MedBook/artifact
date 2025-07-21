@@ -331,7 +331,7 @@ class MainPage(Container):
                                 shape = RoundedRectangleBorder(radius=10),
                                 bgcolor = Dark_bgcolor,
                             ),
-                            # on_click = lambda e: self.close_form()
+                            on_click = lambda e: self.close_form()
                         ),
                         TextButton(
                             content=Text('Save', size = general_txt_size, color = Colors.WHITE),
@@ -349,6 +349,11 @@ class MainPage(Container):
 
         self.page.dialog = self.form
         self.form.open = True
+        self.page.update()
+
+    # 'Cancel' button: function to close the Form of adding new medicine
+    def close_form(self):
+        self.form.open = False
         self.page.update()
 
     # Function of exit clicking the "Exit" button
