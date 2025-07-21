@@ -135,9 +135,9 @@ class MainPage(Container):
 
         # Creating a visual for Schedule page
         ## Calendar
-        self.prev_btn = IconButton(icons.ARROW_BACK, on_click = self.prev_month)
+        self.prev_btn = IconButton(icons.ARROW_BACK, icon_color = unit_color_dark, on_click = self.prev_month)
         self.month_header = Text()
-        self.next_btn = IconButton(icons.ARROW_FORWARD, on_click = self.next_month)
+        self.next_btn = IconButton(icons.ARROW_FORWARD, icon_color = unit_color_dark, on_click = self.next_month)
         self.grid = GridView(max_extent = 80, spacing = 5, run_spacing = 5)
 
         ## Area to add new pill
@@ -160,11 +160,13 @@ class MainPage(Container):
                         controls=[
                             Container(
                                 on_click= self.shrink,
-                                content = Icon(icons.MENU, Colors.BLACK)),
+                                content = Icon(icons.MENU, Colors.BLACK)
+                            ),
                             Text(value = 'MedBook', weight = FontWeight.BOLD, color = 'black'),
                             Container(
                                 # padding= padding.only(right = 16), 
-                                content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK))
+                                content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK)
+                            )
                         ]
                     ),
                     Row(alignment = MainAxisAlignment.CENTER,
@@ -191,7 +193,7 @@ class MainPage(Container):
                 animate = animation.Animation(600, AnimationCurve.DECELERATE),
                 animate_scale = animation.Animation(400, curve = 'decelerate'),
                 padding = padding.only(top = 15, left = 20, right = 40, bottom = 5),
-                # clip_behavior=ClipBehavior.ANTI_ALIAS,
+                clip_behavior = ClipBehavior.ANTI_ALIAS,
                 content = schedule_content
                 # content = Column(controls = [schedule_content])
             )]
@@ -258,49 +260,89 @@ class MainPage(Container):
                 height = txf_height,
                 bgcolor = Colors.WHITE,
                 border_radius = 10,
+                border_color = unit_color_dark,
+                border_width = 1,
+                focused_border_color = unit_color_dark,
+                focused_border_width = 2
             )
+        
         self.medname_field = create_TextField()
         self.qty_field = create_TextField()
-        self.date_picker = DatePicker(value = self.today)
-        self.time_picker = TimePicker(value = self.today.time())
+        self.date_picker = DatePicker()
+        # self.time_picker = TimePicker(value = self.today.time())
         self.note_field = create_TextField()
 
         self.form = AlertDialog(
-            # title = Text('New pills'),
+            bgcolor = Minor_light_bgcolor,
+            inset_padding = padding.symmetric(horizontal = 20, vertical = 20),
+
+            title = Text('New Medicine'),
+            title_padding = padding.only(top = 10, bottom = 10, right = 20, left = 20),
+            
+            content_padding = padding.only(top = 0, left = 20, right = 20, bottom = 10),
             content = Column(
-                controls = [
+                width = base_width,
+                controls = [ 
                     Text('Medication name:', size = general_txt_size),
                     self.medname_field,
                     Text('Quantity of pill:', size = general_txt_size),
                     self.qty_field,
                     Text('Date to take pills:', size = general_txt_size),
-                    self.date_picker,
+                    Container(
+                        bgcolor = Colors.WHITE,            
+                        padding = padding.only(left = 10),
+                        border_radius = 10,
+                        border = BorderSide(                       
+                            color = unit_color_dark, 
+                            width = 1
+                        ),
+                        content = Row(spacing = 0,
+                            alignment = 'spaceBetween',
+                            controls = [
+                                Text('Selected date', size = 12, color = input_hint_color),
+                                IconButton(
+                                    icon = Icons.CALENDAR_MONTH_SHARP, 
+                                    icon_size = 20,
+                                    icon_color = unit_color_dark, 
+                                    highlight_color ='#FFFAFA',
+                                    style = ButtonStyle(shape = RoundedRectangleBorder(radius = border_radius.only( 
+                                        top_right = 10,
+                                        bottom_right = 10))
+                                    ),
+                                    # on_click = lambda _: self.date_picker.pick_date()
+                                )
+                            ]
+                        )
+                    ),
                     # Text('Time to take pills', size = general_txt_size),
                     # self.time_picker,
                     Text('Note:', size = general_txt_size),
                     self.note_field
                 ], 
-                tight = True
             ),
+            actions_padding = padding.only(top = 0, bottom = 15, left = 20, right = 20),
             actions = [
-                TextButton(
-                    content=Text('Cancel', size = general_txt_size, color = Colors.WHITE),
-                    height = txf_height,
-                    style = ButtonStyle(
-                        shape = RoundedRectangleBorder(radius=10),
-                        bgcolor = Dark_bgcolor,
-                    ),
-                    # on_click = lambda e: self.close_form()
-                ),
-                TextButton(
-                    content=Text('Save', size = general_txt_size, color = Colors.WHITE),
-                    height = txf_height,
-                    style = ButtonStyle(
-                        shape = RoundedRectangleBorder(radius=10),
-                        bgcolor = Dark_bgcolor,
-                    ),
-                    # on_click = lambda e: self.save_pill()
-                ),
+                Row(alignment = MainAxisAlignment.END,
+                    controls = [    
+                        TextButton(
+                            content=Text('Cancel', size = general_txt_size, color = Colors.WHITE),
+                            height = txf_height,
+                            style = ButtonStyle(
+                                shape = RoundedRectangleBorder(radius=10),
+                                bgcolor = Dark_bgcolor,
+                            ),
+                            # on_click = lambda e: self.close_form()
+                        ),
+                        TextButton(
+                            content=Text('Save', size = general_txt_size, color = Colors.WHITE),
+                            height = txf_height,
+                            style = ButtonStyle(
+                                shape = RoundedRectangleBorder(radius=10),
+                                bgcolor = Dark_bgcolor,
+                            ),
+                            # on_click = lambda e: self.save_pill()
+                        )
+                ])
             ],
             modal = True,
         )
