@@ -2,7 +2,7 @@ from flet import *
 from utils.traits import *
 from service.authentication import log_out
 import calendar
-from datetime import datetime
+import datetime as dt
 
 class MainPage(Container):
 
@@ -13,7 +13,7 @@ class MainPage(Container):
         
         self.token = ''
 
-        self.today = datetime.today()
+        self.today = dt.datetime.today()
         self.year = self.today.year
         self.month = self.today.month
 
@@ -268,7 +268,7 @@ class MainPage(Container):
         
         self.medname_field = create_TextField()
         self.qty_field = create_TextField()
-        self.date_picker = DatePicker()
+        self.selected_date = Text(str(self.today.date()), size = 12, color = input_hint_color)
         # self.time_picker = TimePicker(value = self.today.time())
         self.note_field = create_TextField()
 
@@ -299,7 +299,7 @@ class MainPage(Container):
                         content = Row(spacing = 0,
                             alignment = 'spaceBetween',
                             controls = [
-                                Text('Selected date', size = 12, color = input_hint_color),
+                                self.selected_date,
                                 IconButton(
                                     icon = Icons.CALENDAR_MONTH_SHARP, 
                                     icon_size = 20,
@@ -309,13 +309,19 @@ class MainPage(Container):
                                         top_right = 10,
                                         bottom_right = 10))
                                     ),
-                                    # on_click = lambda _: self.date_picker.pick_date()
+                                    on_click=lambda e: self.page.open(
+                                        DatePicker(
+                                            first_date = dt.datetime(year = 2024, month = 10, day = 1),
+                                            last_date = dt.datetime(year = 2026, month = 10, day = 1),
+                                            on_change = self.handle_change,
+                                            on_dismiss = self.handle_dismissal,
+                                        )
+                                    )
+
                                 )
                             ]
                         )
                     ),
-                    # Text('Time to take pills', size = general_txt_size),
-                    # self.time_picker,
                     Text('Note:', size = general_txt_size),
                     self.note_field
                 ], 
@@ -331,7 +337,7 @@ class MainPage(Container):
                                 shape = RoundedRectangleBorder(radius=10),
                                 bgcolor = Dark_bgcolor,
                             ),
-                            on_click = lambda e: self.close_form()
+                            on_click = lambda _: self.close_form()
                         ),
                         TextButton(
                             content=Text('Save', size = general_txt_size, color = Colors.WHITE),
@@ -350,6 +356,14 @@ class MainPage(Container):
         self.page.dialog = self.form
         self.form.open = True
         self.page.update()
+
+    def handle_change(self, e):
+        self.selected_date.value = e.control.value.strftime('%Y/%m/%d')
+        self.page.update()
+
+    def handle_dismissal(self, e):
+        self.page.add(Text(f"DatePicker dismissed"))
+        
 
     # 'Cancel' button: function to close the Form of adding new medicine
     def close_form(self):
