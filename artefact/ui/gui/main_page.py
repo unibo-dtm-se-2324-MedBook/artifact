@@ -13,37 +13,19 @@ class MainPage(Container):
         
         self.token = ''
 
-        self.today = dt.datetime.today()
-        self.year = self.today.year
-        self.month = self.today.month
-
-    def set_token(self, token):
-        self.token = token
-        self.update()
-
-    def build(self):
-        # days_card = Row(scroll = 'auto')
-        # days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-        # for day in days:
-        #     days_card.controls.append(
-        #         Container(
-        #             bgcolor = '#3F888F',
-        #             width = 80,
-        #             height = 40,
-        #             border_radius = 15,
-        #             padding = 10,
-        #             content = Text(day, color = '#FFFAFA', text_align = 'center')
-        #         )
-        #     )
-
-        # Creating a visual for navigation
+         # Creating a visual for navigation
         self.navig = Container(
             bgcolor = Dark_bgcolor,
             border_radius= b_radius,
             padding = padding.only(top=10, left=8, bottom=5),
             content = Column(controls = [
-                Row(spacing= 0,
-                    controls=[IconButton(icon=Icons.KEYBOARD_RETURN, icon_color='white', on_click=self.restore, icon_size=20, highlight_color ='#FFFAFA')],
+                Row(spacing = 0,
+                    controls = [IconButton(
+                        icon = Icons.KEYBOARD_RETURN, icon_color='white', 
+                        on_click=self.restore, 
+                        icon_size=20, 
+                        highlight_color ='#FFFAFA')
+                    ],
                 ),
                 Container(
                     padding = padding.only(left=15),
@@ -98,36 +80,35 @@ class MainPage(Container):
                     )
                 ]), 
 
-                Container(height=5),
+                Container(height = 5),
                 Row(controls=[
                     TextButton(
                         # on_click= self.go_to_page,
                         content = Row(controls = [
                             Icon(icons.PERSON_OUTLINE, color="white60"),
                             Text(value="Personal info",
-                                size=15,
-                                weight=FontWeight.W_300,
-                                color="white",
-                                font_family="poppins"
+                                size = 15,
+                                weight = FontWeight.W_300,
+                                color = "white",
+                                font_family = "poppins"
                             )
                         ])
                     )
                 ]),
                 
-                Container(height=20),
+                Container(height = 20),
                 Row(controls=[
                     TextButton(
                         content = Row(controls = [
                             Icon(icons.EXIT_TO_APP, color="white60"),
                             Text("Exit",
-                                size=15,
-                                weight=FontWeight.W_300,
-                                color="white",
-                                font_family="poppins"
+                                size = 15,
+                                weight = FontWeight.W_300,
+                                color = "white",
+                                font_family = "poppins"
                             ) 
                         ]),
                         on_click = self.exit
-                        # on_click= lambda _: self.page.go('/first_page'),
                     )
                 ])
             ])
@@ -135,13 +116,15 @@ class MainPage(Container):
 
         # Creating a visual for Schedule page
         ## Calendar
-        self.prev_btn = IconButton(icons.ARROW_BACK, icon_color = unit_color_dark, on_click = self.prev_month)
-        self.month_header = Text()
-        self.next_btn = IconButton(icons.ARROW_FORWARD, icon_color = unit_color_dark, on_click = self.next_month)
-        self.grid = GridView(max_extent = 80, spacing = 5, run_spacing = 5)
+        self.today = dt.datetime.today()
+        self.year = self.today.year
+        self.month = self.today.month
 
+        self.prev_btn = IconButton(icons.ARROW_BACK, icon_color = unit_color_dark, on_click = self.prev_month)
+        self.next_btn = IconButton(icons.ARROW_FORWARD, icon_color = unit_color_dark, on_click = self.next_month)
+        
         ## Area to add new pill
-        self.btn_add = ElevatedButton(
+        self.btn_add_pill = ElevatedButton(
             content = Text('Add the pill', size = 14, color = Colors.WHITE),
             height = txf_height,
             width = btn_width,
@@ -150,6 +133,18 @@ class MainPage(Container):
             on_click = self.show_form
         )
         self.form = None
+
+    def set_token(self, token):
+        self.token = token
+        self.update()
+
+    def build(self):
+
+        # Creating a visual for Schedule page
+        # month_name = calendar.month_name[self.month]
+        # month_header = Text(f"{month_name} {self.year}", size=16)
+        self.month_header = Text()
+        self.grid = GridView(max_extent = 80, spacing = 5, run_spacing = 5)
 
         ## Combine
         schedule_content = Container(
@@ -171,12 +166,12 @@ class MainPage(Container):
                     ),
                     Row(alignment = MainAxisAlignment.CENTER,
                         controls = [Text('Schedule', size = 16)]),
-                    Row(alignment = 'spaceBetween', #alignment = MainAxisAlignment.CENTER
+                    Row(alignment = 'spaceBetween',
                         controls = [self.prev_btn, self.month_header, self.next_btn],
                     ),
                     self.grid,
                     Divider(),
-                    self.btn_add
+                    self.btn_add_pill
                 ]
             )
         )
@@ -195,7 +190,6 @@ class MainPage(Container):
                 padding = padding.only(top = 15, left = 20, right = 40, bottom = 5),
                 clip_behavior = ClipBehavior.ANTI_ALIAS,
                 content = schedule_content
-                # content = Column(controls = [schedule_content])
             )]
         )
 
