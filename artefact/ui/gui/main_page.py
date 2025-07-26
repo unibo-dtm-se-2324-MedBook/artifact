@@ -120,8 +120,20 @@ class MainPage(Container):
         self.year = self.today.year
         self.month = self.today.month
 
-        self.prev_btn = IconButton(icons.ARROW_BACK, icon_color = unit_color_dark, on_click = self.prev_month)
-        self.next_btn = IconButton(icons.ARROW_FORWARD, icon_color = unit_color_dark, on_click = self.next_month)
+        self.prev_btn = IconButton(
+            icons.ARROW_BACK, 
+            icon_color = unit_color_dark, 
+            icon_size = 16, 
+            width = 32,
+            height = 32,
+            on_click = self.prev_month)
+        self.next_btn = IconButton(
+            icons.ARROW_FORWARD, 
+            icon_color = unit_color_dark, 
+            icon_size = 16, 
+            width = 32,
+            height = 32,
+            on_click = self.next_month)
         
         # Weekday headers
         weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -130,14 +142,12 @@ class MainPage(Container):
             controls = [
                 Container(
                     width = calendar_width / 7,
-                    height = 20,
+                    height = 25,
                     alignment = alignment.center,
-                    # padding = padding.only(bottom = 2),
-                    margin = padding.only(bottom = 5),
-                    content = Text(day, size = calendar_txt, weight = FontWeight.BOLD), # text_align = 'center' 
+                    padding = padding.only(bottom = 5),
+                    content = Text(day, size = calendar_txt, weight = FontWeight.BOLD),
                     border = border.only(
-                        top=border.BorderSide(1, unit_color_dark),
-                        bottom = border.BorderSide(1, unit_color_dark)
+                        bottom = border.BorderSide(2, unit_color_dark)
                     )
                 ) for day in weekdays
             ]
@@ -145,17 +155,15 @@ class MainPage(Container):
 
         # Container for the calendar with days
         self.calendar = Container(
-            # expand=True,
             height = calendar_height,
             width = calendar_width,
-            border = border.only(
-                            top = border.BorderSide(1, unit_color_dark),
-                            bottom = border.BorderSide(1, unit_color_dark)
-            ),
+            # border = border.only(
+            #                 top = border.BorderSide(1, unit_color_dark),
+            #                 bottom = border.BorderSide(1, unit_color_dark)
+            # ),
             padding = padding.all(0),
             margin  = margin.all(0),
-            content = Column(spacing = 0, tight=True, controls = [])
-            # content = Column(spacing = 0, expand  = True, controls = [])
+            content = Column(spacing = 0, tight = True, controls = [])
         )
 
         # Button to add new pill
@@ -177,7 +185,7 @@ class MainPage(Container):
 
     def build(self):
         # Creating a visual for timetable
-        month_header = Text(f"{calendar.month_name[self.month]} {self.year}", size = 16)
+        month_header = Text(f'{calendar.month_name[self.month]} {self.year}', size = general_txt_size, italic = True)
 
         weeks = calendar.monthcalendar(self.year, self.month)
         rows = []
@@ -194,12 +202,10 @@ class MainPage(Container):
                         padding = padding.all(0),
                         margin = margin.all(0),
                         border = border.only(
-                            top = border.BorderSide(1, unit_color_dark),
                             bottom = border.BorderSide(1, unit_color_dark)
                         ),
                         content = Column(
                             spacing = 0,
-                            # expand  = True,
                             tight   = True,
                             controls = [
                                 # dates
@@ -220,15 +226,14 @@ class MainPage(Container):
                         )
                     )
                 )
-            # rows.append(Row(spacing = 0, expand  = True, controls = cells))
-            rows.append(Row(spacing = 0, tight=True, controls = cells))
+            rows.append(Row(spacing = 0, tight = True, controls = cells))
         self.calendar.content.controls = rows
 
 
         ## Combine
         schedule_content = Container(
             content = Column(
-                # expand=True,
+                spacing = 5,
                 controls=[
                     Row(
                         alignment = 'spaceBetween',
@@ -237,26 +242,27 @@ class MainPage(Container):
                                 on_click= self.shrink,
                                 content = Icon(icons.MENU, Colors.BLACK)
                             ),
-                            Text(value = 'MedBook', weight = FontWeight.BOLD, color = 'black'),
+                            Text(value = 'MedBook',  color = 'black'),
                             Container(
                                 content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK)
                             )
                         ]
                     ),
+                    Divider(),
                     Row(alignment = MainAxisAlignment.CENTER,
-                        controls = [Text('Schedule', size = 16)]),
+                        controls = [Text('Schedule', weight = FontWeight.BOLD, size = 16)]),
                     Row(alignment = 'spaceBetween',
                         controls = [self.prev_btn, month_header, self.next_btn],
                     ),
                     Column(
-                        spacing = 0,       
+                        spacing = 0,     
                         controls = [
                             self.weekdays_row,
                             self.calendar,
                         ]
                     ),
                     Container(
-                        # margin = padding.only(bottom = 10),
+                        margin = padding.only(bottom = 20, top = 10),
                         content = self.btn_add_pill
                     )
                 ]
@@ -291,6 +297,7 @@ class MainPage(Container):
             )
         )
     
+
     # Open navigation moving the schedule to the right
     def shrink(self, e):
         self.schedule.controls[0].width = 70
@@ -305,53 +312,6 @@ class MainPage(Container):
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
 
-    # Generate calendar
-    # def create_calendar(self):
-    #     self.grid.controls.clear()
-        
-    #     self.month_header.value = f'{calendar.month_name[self.month]} {self.year}'
-    #     first_wday, total_days = calendar.monthrange(self.year, self.month)
-    #     for _ in range(first_wday): # empty cells before the first day
-    #         self.grid.controls.append(Container())
-
-    #     self.update()
-    
-    
-    def generate_calendar(self):
-        self.month_header.value = f"{calendar.month_name[self.month]} {self.year}"
-        self.grid.controls.clear()
-
-        first_wday, total_days = calendar.monthrange(self.year, self.month)
-    #     # Empty cells before first day
-        for _ in range(first_wday):
-            self.grid.controls.append(Container(width=(base_width-60)/7, height=40))
-
-    #     # Day cells
-        for day in range(1, total_days + 1):
-            # date_str = f"{self.year}-{self.month:02d}-{day:02d}"
-    #         ev_list = self.events.get(date_str, [])
-    #         # Create small dots for events
-    #         markers = [
-    #             Container(width=8, height=8, bgcolor=colors.BLUE, border_radius=4)
-    #             for _ in ev_list[:3]  # show up to 3 dots
-    #         ]
-    #         # If more than 3 events, add a '+' indicator
-    #         if len(ev_list) > 3:
-    #             markers.append(Text(f"+{len(ev_list)-3}", size=8))
-
-            day_cell = Container(
-                content=Column([
-                    Text(str(day), size=12),
-                    # Row(markers, alignment=MainAxisAlignment.CENTER)
-                ], alignment=MainAxisAlignment.START),
-                width=(base_width-60)/7,
-                height=40,
-                border=border.all(1, colors.GREY),
-                # on_click=lambda e, d=day: self.open_day_events(d)
-            )
-            self.grid.controls.append(day_cell)
-
-        self.update()
 
     # Functions to go one month forward or back
     def prev_month(self, e):
@@ -359,7 +319,6 @@ class MainPage(Container):
             self.month, self.year = 12, self.year - 1
         else:
             self.month -= 1
-        # self.generate_calendar()
         self.update()
 
     def next_month(self, e):
@@ -367,7 +326,6 @@ class MainPage(Container):
             self.month, self.year = 1, self.year + 1
         else:
             self.month += 1
-        # self.generate_calendar()
         self.update()
     
     # Creating the form for new medicine
@@ -487,6 +445,7 @@ class MainPage(Container):
     def close_form(self):
         self.form.open = False
         self.page.update()
+
 
     # Function of exit clicking the "Exit" button in navigation
     def exit(self, e):
