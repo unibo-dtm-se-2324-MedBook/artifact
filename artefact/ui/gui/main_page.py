@@ -135,7 +135,7 @@ class MainPage(Container):
             height = 32,
             on_click = self.next_month)
         
-        # Weekday headers
+        ## Weekday headers
         weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
         self.weekdays_row = Row(
             spacing = 0,
@@ -153,7 +153,7 @@ class MainPage(Container):
             ]
         )
 
-        # Container for the calendar with days
+        ## Container for the calendar with days
         self.calendar = Container(
             height = calendar_height,
             width = calendar_width,
@@ -166,7 +166,7 @@ class MainPage(Container):
             content = Column(spacing = 0, tight = True, controls = [])
         )
 
-        # Button to add new pill
+        ## Button to add new pill
         self.btn_add_pill = ElevatedButton(
             content = Text('Add the pill', size = 14, color = Colors.WHITE),
             height = txf_height,
@@ -184,9 +184,93 @@ class MainPage(Container):
 
 
     def build(self):
-        # Creating a visual for timetable
-        month_header = Text(f'{calendar.month_name[self.month]} {self.year}', size = general_txt_size, italic = True)
+        self.month_header = Text(f'{calendar.month_name[self.month]} {self.year}', size = general_txt_size, italic = True)
+        self._generate_calendar()
 
+        # Combine visual elements of Schedule page
+        schedule_content = Container(
+            content = Column(
+                spacing = 5,
+                controls=[
+                    Row(
+                        alignment = 'spaceBetween',
+                        controls=[
+                            Container(
+                                on_click= self.shrink,
+                                content = Icon(icons.MENU, Colors.BLACK)
+                            ),
+                            Text(value = 'MedBook',  color = 'black'),
+                            Container(
+                                content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK)
+                            )
+                        ]
+                    ),
+                    Divider(),
+                    Row(alignment = MainAxisAlignment.CENTER,
+                        controls = [Text('Schedule', weight = FontWeight.BOLD, size = 16)]),
+                    Row(alignment = 'spaceBetween',
+                        controls = [self.prev_btn, self.month_header, self.next_btn],
+                    ),
+                    Column(
+                        spacing = 0,     
+                        controls = [
+                            self.weekdays_row,
+                            self.calendar,
+                        ]
+                    ),
+                    Container(
+                        margin = padding.only(bottom = 20, top = 10),
+                        content = self.btn_add_pill
+                    )
+                ]
+            )
+        )
+
+        # Properties of Schedule page: basic and animation
+        self.schedule = Row(
+            alignment='end',
+            controls=[Container(
+                width = base_width, 
+                height = base_height, 
+                bgcolor = Light_bgcolor,
+                border_radius = b_radius,
+                animate = animation.Animation(600, AnimationCurve.DECELERATE),
+                animate_scale = animation.Animation(400, curve = 'decelerate'),
+                padding = padding.only(top = 15, left = 20, right = 40, bottom = 15), #5
+                clip_behavior = ClipBehavior.ANTI_ALIAS,
+                content = schedule_content
+            )]
+        )
+
+        # Combine Navigation + Schedule
+        self.content = Container(
+            width = base_width, 
+            height = base_height, 
+            bgcolor = Light_bgcolor,
+            border_radius = b_radius,
+            expand = True,
+            content = Stack(
+                controls = [self.navig, self.schedule]
+            )
+        )
+    
+
+    # Open navigation moving the schedule to the right
+    def shrink(self, e):
+        self.schedule.controls[0].width = 70
+        self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
+        self.schedule.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
+        self.schedule.update()
+
+    # Close navigation opening the schedule
+    def restore(self, e):
+        self.schedule.controls[0].width = base_width
+        self.schedule.controls[0].border_radius = b_radius
+        self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
+        self.schedule.update()
+
+    # Build the part of calendar with dates
+    def _generate_calendar(self):
         weeks = calendar.monthcalendar(self.year, self.month)
         rows = []
         row_height = calendar_height / 6
@@ -229,96 +313,14 @@ class MainPage(Container):
             rows.append(Row(spacing = 0, tight = True, controls = cells))
         self.calendar.content.controls = rows
 
-
-        ## Combine
-        schedule_content = Container(
-            content = Column(
-                spacing = 5,
-                controls=[
-                    Row(
-                        alignment = 'spaceBetween',
-                        controls=[
-                            Container(
-                                on_click= self.shrink,
-                                content = Icon(icons.MENU, Colors.BLACK)
-                            ),
-                            Text(value = 'MedBook',  color = 'black'),
-                            Container(
-                                content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK)
-                            )
-                        ]
-                    ),
-                    Divider(),
-                    Row(alignment = MainAxisAlignment.CENTER,
-                        controls = [Text('Schedule', weight = FontWeight.BOLD, size = 16)]),
-                    Row(alignment = 'spaceBetween',
-                        controls = [self.prev_btn, month_header, self.next_btn],
-                    ),
-                    Column(
-                        spacing = 0,     
-                        controls = [
-                            self.weekdays_row,
-                            self.calendar,
-                        ]
-                    ),
-                    Container(
-                        margin = padding.only(bottom = 20, top = 10),
-                        content = self.btn_add_pill
-                    )
-                ]
-            )
-        )
-
-        # Schedule page with animation characteristics
-        self.schedule = Row(
-            alignment='end',
-            controls=[Container(
-                width = base_width, 
-                height = base_height, 
-                bgcolor = Light_bgcolor,
-                border_radius = b_radius,
-                animate = animation.Animation(600, AnimationCurve.DECELERATE),
-                animate_scale = animation.Animation(400, curve = 'decelerate'),
-                padding = padding.only(top = 15, left = 20, right = 40, bottom = 15), #5
-                clip_behavior = ClipBehavior.ANTI_ALIAS,
-                content = schedule_content
-            )]
-        )
-
-        # Whole Main page (navigation + schedule)
-        self.content = Container(
-            width = base_width, 
-            height = base_height, 
-            bgcolor = Light_bgcolor,
-            border_radius = b_radius,
-            expand = True,
-            content = Stack(
-                controls = [self.navig, self.schedule]
-            )
-        )
-    
-
-    # Open navigation moving the schedule to the right
-    def shrink(self, e):
-        self.schedule.controls[0].width = 70
-        self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
-        self.schedule.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
-        self.schedule.update()
-
-    # Close navigation opening the schedule
-    def restore(self, e):
-        self.schedule.controls[0].width = base_width
-        self.schedule.controls[0].border_radius = b_radius
-        self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
-        self.schedule.update()
-
-
     # Functions to go one month forward or back
     def prev_month(self, e):
         if self.month == 1:
             self.month, self.year = 12, self.year - 1
         else:
             self.month -= 1
+        self.month_header.value = f"{calendar.month_name[self.month]} {self.year}"
+        self._generate_calendar()
         self.update()
 
     def next_month(self, e):
@@ -326,6 +328,8 @@ class MainPage(Container):
             self.month, self.year = 1, self.year + 1
         else:
             self.month += 1
+        self.month_header.value = f"{calendar.month_name[self.month]} {self.year}"
+        self._generate_calendar()
         self.update()
     
     # Creating the form for new medicine
