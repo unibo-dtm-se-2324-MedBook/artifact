@@ -3,6 +3,8 @@ from utils.traits import *
 from service.authentication import log_out
 import calendar
 import datetime as dt
+from service.database import save_pill_database
+from firebase_admin import auth as firebase_auth
 
 class MainPage(Container):
 
@@ -332,6 +334,7 @@ class MainPage(Container):
         self._generate_calendar()
         self.update()
     
+
     # Creating the form for new medicine
     def show_form(self, e):
         def create_TextField():
@@ -427,7 +430,7 @@ class MainPage(Container):
                                 shape = RoundedRectangleBorder(radius=10),
                                 bgcolor = Dark_bgcolor,
                             ),
-                            # on_click = lambda e: self.save_pill()
+                            on_click = lambda e: self.save_medicine()
                         )
                 ])
             ],
@@ -449,6 +452,27 @@ class MainPage(Container):
     def close_form(self):
         self.form.open = False
         self.page.update()
+
+    def save_medicine(self):
+        pill_name = self.medname_field.value
+        pill_qty = self.qty_field.value
+        # date = self.date_picker.value.strftime('%Y-%m-%d')
+        pill_date = self.selected_date.value
+        pill_note = self.note_field.value
+
+        decoded_token = firebase_auth.verify_id_token(self.token)
+        uid = decoded_token['uid']
+
+        if pill_name and pill_qty and pill_date:
+            save_pill_database(uid, self.token, pill_name, pill_qty, pill_date, pill_note)
+            self.form.open = False
+            self.page.snack_bar = SnackBar(Text('Medicine saved'))
+            self.page.snack_bar.open = True
+            self.page.update()
+        else:
+            self.page.snack_bar = SnackBar(Text('Please, fill all fields'))
+            self.page.snack_bar.open = True
+            self.page.update()
 
 
     # Function of exit clicking the "Exit" button in navigation
