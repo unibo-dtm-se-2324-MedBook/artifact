@@ -285,6 +285,7 @@ class MainPage(UserControl):
 
     # Build the part of calendar with dates and markers
     def _generate_calendar(self):
+        print("Keys in data_by_date:", list(self.data_by_date.keys()))
         weeks = calendar.monthcalendar(self.year, self.month)
         rows = []
         row_height = calendar_height / 6
@@ -293,9 +294,10 @@ class MainPage(UserControl):
         for week in weeks:
             cells = []
             for day in week:
-                date_key = f'{self.year}/{self.month:02d}/{day:02d}'
+                date_key = f'{self.year}-{self.month:02d}-{day:02d}'
                 pills = self.data_by_date.get(date_key, [])
                 # 
+                print('date_key = ', date_key)
                 print('Pills = ', pills)
                 
                 markers = []
@@ -494,7 +496,7 @@ class MainPage(UserControl):
         self.page.update()
 
     def handle_change(self, e):
-        self.selected_date.value = e.control.value.strftime('%Y/%m/%d')
+        self.selected_date.value = e.control.value.strftime('%Y-%m-%d')
         self.page.update()
 
     def handle_dismissal(self, e):
@@ -518,10 +520,17 @@ class MainPage(UserControl):
             self.page.snack_bar = SnackBar(Text('Medicine saved'))
             self.page.snack_bar.open = True
             self.page.update()
+
+            # Update local storage: add a new entry to self.data_by_date
+            key = pill_date
+            entry = {'medicine_name': pill_name, 'quantity': pill_qty, 'note': pill_note}
+            self.data_by_date.setdefault(key, []).append(entry)
+            self._generate_calendar()
+            self.update()
         else:
             self.page.snack_bar = SnackBar(Text('Please, fill all fields'))
             self.page.snack_bar.open = True
-            self.page.update()
+            self.update()
 
 
     # Function of exit clicking the "Exit" button in navigation

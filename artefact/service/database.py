@@ -31,7 +31,7 @@ def load_medicines_for_user(uid, id_token, year, month):
         for item in result.each():
             value = item.val()
             date_str = value['date']
-            date = datetime.strptime(date_str, '%Y/%m/%d')
+            date = datetime.strptime(date_str, '%Y-%m-%d')
             if date.year == year and date.month == month:
                 pill = {'medicine_name': value['medicine_name'], 'quantity': value['quantity'], 'note': value['note']}
                 if date_str not in data_by_date:
