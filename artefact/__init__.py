@@ -76,10 +76,15 @@ class App(UserControl):
                 self.signup_page.set_email(self.temp_email)
                 self.temp_email = ''
         elif self.page.route == "/main_page":
-            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.main_page]))
-            if self.token:
-                self.main_page.set_token(self.token)
-                self.set_token = ''
+            self.page.controls.clear()
+            shedule_page = MainPage(token=self.token)
+            self.main_page = shedule_page
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[shedule_page]))
+            
+            # self.page.add(WindowDrag(), Stack(expand=True, controls=[self.main_page]))
+            # if self.token:
+            #     self.main_page.set_token(self.token)
+            #     self.token = ''
         
         self.page.update()
 
