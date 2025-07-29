@@ -3,17 +3,20 @@ from utils.traits import *
 from service.authentication import log_out
 import calendar
 import datetime as dt
-from service.database import save_pill_database
+from service.database import save_pill_database, load_medicines_for_user
 from firebase_admin import auth as firebase_auth
 
-class MainPage(Container):
+# class MainPage(Container):
+class MainPage(UserControl):
 
-    def __init__(self):
+    def __init__(self, token = None):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
         
-        self.token = ''
+        # self.token = ''
+        self.token = token
+        self.user_uid = ''
 
          # Creating a visual for navigation
         self.navig = Container(
@@ -117,6 +120,7 @@ class MainPage(Container):
         )
 
         # Creating a visual for Schedule page
+        self.data_by_date = {}
         ## Calendar
         self.today = dt.datetime.today()
         self.year = self.today.year
@@ -180,13 +184,20 @@ class MainPage(Container):
         self.form = None 
 
 
-    def set_token(self, token):
-        self.token = token
-        self.update()
+    # def set_token(self, token):
+    #     self.token = token
+    #     self.update()
 
 
     def build(self):
         self.month_header = Text(f'{calendar.month_name[self.month]} {self.year}', size = general_txt_size, italic = True)
+
+        if self.token:
+            self.user_uid = firebase_auth.verify_id_token(self.token)['uid']
+            print('uid = ', self.user_uid)
+            self.data_by_date = load_medicines_for_user(self.user_uid, self.token, self.year, self.month)
+            print('After calling load_medicines_for_user', self.data_by_date)
+        else: print('token wasn"t found')
         self._generate_calendar()
 
         # Combine visual elements of Schedule page
@@ -255,7 +266,8 @@ class MainPage(Container):
                 controls = [self.navig, self.schedule]
             )
         )
-    
+
+        return self.content
 
     # Open navigation moving the schedule to the right
     def shrink(self, e):
@@ -271,7 +283,7 @@ class MainPage(Container):
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
 
-    # Build the part of calendar with dates
+    # Build the part of calendar with dates and markers
     def _generate_calendar(self):
         weeks = calendar.monthcalendar(self.year, self.month)
         rows = []
@@ -281,40 +293,80 @@ class MainPage(Container):
         for week in weeks:
             cells = []
             for day in week:
+                date_key = f'{self.year}/{self.month:02d}/{day:02d}'
+                pills = self.data_by_date.get(date_key, [])
+                # 
+                print('Pills = ', pills)
+                
+                markers = []
+                corners = [
+                    {"left": 2, "top": 2}, # 2px
+                    {"right": 2, "top": 2},
+                    {"left": 2, "bottom": 2},
+                ]
+
+                for i in range(min(len(pills), 3)):
+                    color = (colors.BLUE_ACCENT_200, colors.PURPLE_ACCENT_200, colors.TEAL_ACCENT_200)[i]
+                    markers.append(
+                        Container(
+                            width = 6,
+                            height = 6,
+                            bgcolor = color,
+                            border_radius = 3,
+                            **corners[i]
+                        )
+                    )
+                if len(pills) > 3:
+                    markers.append(
+                        Container(
+                            content = Text(f'+{len(pills) - 3}', size = 10, weight = FontWeight.BOLD),
+                            right = 2,
+                            bottom = 2
+                        )
+                    )
+
+                date_container = Container(
+                    content = Text(str(day) if day else '', size = calendar_txt),
+                    alignment = alignment.center,
+                    padding = padding.all(0),
+                    margin = margin.all(0),
+                )
+
+                markers_container = Container(
+                    expand = True,
+                    padding = padding.all(0),
+                    margin = margin.all(0),
+                    content = Stack(
+                        expand = True,
+                        controls = markers
+                    )
+                )
+
+                cell_content = Column(
+                    spacing = 0, 
+                    tight = True,
+                    controls = [date_container, markers_container]
+                )
+
                 cells.append(
                     Container(
-                        width = cell_width,
+                        width = cell_width, 
                         height = row_height,
                         padding = padding.all(0),
                         margin = margin.all(0),
                         border = border.only(
                             bottom = border.BorderSide(1, unit_color_dark)
                         ),
-                        content = Column(
-                            spacing = 0,
-                            tight   = True,
-                            controls = [
-                                # dates
-                                Container(
-                                    content = Text(str(day) if day else '', size = calendar_txt),
-                                    alignment = alignment.center,
-                                    padding = padding.all(0),
-                                    margin = margin.all(0),
-                                ),
-                                # markers
-                                Container(
-                                    expand  = True,
-                                    padding = padding.all(0),
-                                    margin = margin.all(0),
-                                    content = None,
-                                )
-                            ]
-                        )
+                        content = cell_content,
+                        on_click = (lambda e, d = day: self.open_day_dialog(d)) if pills else None
                     )
                 )
             rows.append(Row(spacing = 0, tight = True, controls = cells))
         self.calendar.content.controls = rows
 
+    def open_day_dialog(self, day):
+        pass
+    
     # Functions to go one month forward or back
     def prev_month(self, e):
         if self.month == 1:
@@ -460,11 +512,8 @@ class MainPage(Container):
         pill_date = self.selected_date.value
         pill_note = self.note_field.value
 
-        decoded_token = firebase_auth.verify_id_token(self.token)
-        uid = decoded_token['uid']
-
         if pill_name and pill_qty and pill_date:
-            save_pill_database(uid, self.token, pill_name, pill_qty, pill_date, pill_note)
+            save_pill_database(self.user_uid, self.token, pill_name, pill_qty, pill_date, pill_note)
             self.form.open = False
             self.page.snack_bar = SnackBar(Text('Medicine saved'))
             self.page.snack_bar.open = True
