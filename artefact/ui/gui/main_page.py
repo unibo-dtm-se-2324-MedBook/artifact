@@ -150,7 +150,7 @@ class MainPage(UserControl):
                     width = calendar_width / 7,
                     height = 25,
                     alignment = alignment.center,
-                    padding = padding.only(bottom = 5),
+                    padding = padding.only(bottom = 3),
                     content = Text(day, size = calendar_txt, weight = FontWeight.BOLD),
                     border = border.only(
                         bottom = border.BorderSide(2, unit_color_dark)
@@ -302,28 +302,28 @@ class MainPage(UserControl):
                 
                 markers = []
                 corners = [
-                    {"left": 2, "top": 2}, # 2px
-                    {"right": 2, "top": 2},
-                    {"left": 2, "bottom": 2},
+                    {"left": 4, "top": 2}, # 4px
+                    {"right": 4, "top": 2},
+                    {"left": 4, "bottom": 2},
                 ]
 
                 for i in range(min(len(pills), 3)):
                     color = (colors.BLUE_ACCENT_200, colors.PURPLE_ACCENT_200, colors.TEAL_ACCENT_200)[i]
                     markers.append(
                         Container(
-                            width = 6,
-                            height = 6,
+                            width = 5,
+                            height = 5,
                             bgcolor = color,
-                            border_radius = 3,
+                            border_radius = 2,
                             **corners[i]
                         )
                     )
                 if len(pills) > 3:
                     markers.append(
                         Container(
-                            content = Text(f'+{len(pills) - 3}', size = 10, weight = FontWeight.BOLD),
-                            right = 2,
-                            bottom = 2
+                            content = Text(f'+{len(pills) - 3}', size = 8, weight = FontWeight.BOLD),
+                            right = 4,
+                            bottom = 1
                         )
                     )
 
