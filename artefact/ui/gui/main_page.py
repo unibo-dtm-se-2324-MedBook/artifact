@@ -387,7 +387,7 @@ class MainPage(UserControl):
                     margin = padding.all(0),
                     alignment = alignment.center,
                     content = Text(pill['medicine_name'], size = general_txt_size),
-                    on_click = lambda e, p = pill: self.show_med_detail(date_key, p)
+                    on_click = lambda e, p = pill: self._show_med_detail(date_key, p)
                 )
             )
 
@@ -412,16 +412,69 @@ class MainPage(UserControl):
         med_list_dialog.open = True
         self.page.update()
 
-    def show_med_detail(date_key, p):
-        pass 
-
-    # Function to close the Dialog of the page    
+    # Function to close a Dialog of the page    
     def _close_dialog(self):
         if self.page.dialog:
             self.page.dialog.open = False
             self.page.update()
 
-    
+
+    def _show_med_detail(self, date_key, pill):
+        med_desctiption = AlertDialog(
+            bgcolor = minor_light_bgcolor,
+            inset_padding = padding.symmetric(horizontal = 20, vertical = 20),
+
+            title = Container(
+                alignment = alignment.center,
+                content = Text(pill['medicine_name'], size = 18)
+            ),
+            title_padding = padding.only(top = 20, bottom = 10),
+
+            content_padding = padding.only(top = 0, bottom = 15, left = 20, right = 20),
+            content = Column(
+                tight = True,
+                controls = [
+                    Divider(thickness = 2, color = unit_color_dark),
+                    Row(controls =[
+                        Text('Quantity:', size = general_txt_size, weight = FontWeight.BOLD),
+                        Text(f'{pill['quantity']}', size = general_txt_size),
+                    ]),
+                    Row(controls =[
+                        Text('Note:', size = general_txt_size, weight = FontWeight.BOLD),
+                        Text(f'{pill['note']}', size = general_txt_size),
+                    ]),
+                    Container(
+                        alignment = alignment.center, 
+                        margin = padding.only(top = 10),   
+                        content = TextButton(
+                            content=Text('Delete the medicine', size = general_txt_size, color = Colors.WHITE),
+                            height = txf_height,
+                            style = ButtonStyle(
+                                shape = RoundedRectangleBorder(radius=10),
+                                bgcolor = Dark_bgcolor,
+                            ),
+                            on_click = lambda e: self._delete_pill(date_key, pill)
+                        )
+                    )
+                ], 
+            ),
+
+            actions = [
+                # TextButton(
+                #     content = Text('Delete', size = general_txt_size, color = unit_color_dark),
+                #     on_click = lambda e: self._delete_pill(date_key, pill)),
+                TextButton(
+                    content = Text('Close', size = general_txt_size, color = unit_color_dark), 
+                    on_click = lambda _: self._close_dialog()),
+            ]
+        )
+        self.page.dialog = med_desctiption
+        med_desctiption.open = True
+        self.page.update()
+
+    def _delete_pill(date_key, pill):
+        pass
+
     # Functions to go one month forward or back
     def prev_month(self, e):
         if self.month == 1:
