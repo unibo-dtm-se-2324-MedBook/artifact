@@ -283,6 +283,33 @@ class MainPage(UserControl):
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
 
+    # Functions to go one month forward or back
+    def prev_month(self, e):
+        if self.month == 1:
+            self.month, self.year = 12, self.year - 1
+        else:
+            self.month -= 1
+
+        if self.token:
+            self.data_by_date = load_medicines_for_user(self.user_uid, self.token, self.year, self.month)
+
+        self.month_header.value = f'{calendar.month_name[self.month]} {self.year}'
+        self._generate_calendar()
+        self.update()
+
+    def next_month(self, e):
+        if self.month == 12:
+            self.month, self.year = 1, self.year + 1
+        else:
+            self.month += 1
+        
+        if self.token:
+            self.data_by_date = load_medicines_for_user(self.user_uid, self.token, self.year, self.month)
+
+        self.month_header.value = f'{calendar.month_name[self.month]} {self.year}'
+        self._generate_calendar()
+        self.update()
+    
     # Build the part of calendar with dates and markers
     def _generate_calendar(self):
         print("Keys in data_by_date:", list(self.data_by_date.keys()))
@@ -459,13 +486,9 @@ class MainPage(UserControl):
                 ], 
             ),
 
-            actions = [
-                # TextButton(
-                #     content = Text('Delete', size = general_txt_size, color = unit_color_dark),
-                #     on_click = lambda e: self._delete_pill(date_key, pill)),
-                TextButton(
-                    content = Text('Close', size = general_txt_size, color = unit_color_dark), 
-                    on_click = lambda _: self._close_dialog()),
+            actions = [TextButton(
+                content = Text('Close', size = general_txt_size, color = unit_color_dark), 
+                on_click = lambda _: self._close_dialog()),
             ]
         )
         self.page.dialog = med_desctiption
@@ -493,26 +516,6 @@ class MainPage(UserControl):
         self._generate_calendar()
         self.update()
 
-
-    # Functions to go one month forward or back
-    def prev_month(self, e):
-        if self.month == 1:
-            self.month, self.year = 12, self.year - 1
-        else:
-            self.month -= 1
-        self.month_header.value = f"{calendar.month_name[self.month]} {self.year}"
-        self._generate_calendar()
-        self.update()
-
-    def next_month(self, e):
-        if self.month == 12:
-            self.month, self.year = 1, self.year + 1
-        else:
-            self.month += 1
-        self.month_header.value = f"{calendar.month_name[self.month]} {self.year}"
-        self._generate_calendar()
-        self.update()
-    
 
     # Creating the form for new medicine
     def show_form(self, e):
