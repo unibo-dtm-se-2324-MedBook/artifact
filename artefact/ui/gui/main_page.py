@@ -466,10 +466,18 @@ class MainPage(UserControl):
                         Text('Quantity:', size = general_txt_size, weight = FontWeight.BOLD),
                         Text(f'{pill['quantity']}', size = general_txt_size),
                     ]),
-                    Row(controls =[
-                        Text('Note:', size = general_txt_size, weight = FontWeight.BOLD),
-                        Text(f'{pill['note']}', size = general_txt_size),
-                    ]),
+                    Row(
+                        vertical_alignment = CrossAxisAlignment.START,
+                        controls =[
+                            Text('Note:', size = general_txt_size, weight = FontWeight.BOLD),
+                            Text(f'{pill['note']}', 
+                                size = general_txt_size, 
+                                no_wrap=False,
+                                overflow="visible",
+                                expand=True,
+                            ),
+                        ]
+                    ),
                     Container(
                         alignment = alignment.center, 
                         margin = padding.only(top = 10),   
