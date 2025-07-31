@@ -3,7 +3,7 @@ from utils.traits import *
 from service.authentication import log_out
 import calendar
 import datetime as dt
-from service.database import save_pill_database, load_medicines_for_user
+from service.database import save_pill_database, load_medicines_for_user, delete_pill_database
 from firebase_admin import auth as firebase_auth
 
 # class MainPage(Container):
@@ -472,8 +472,27 @@ class MainPage(UserControl):
         med_desctiption.open = True
         self.page.update()
 
-    def _delete_pill(date_key, pill):
-        pass
+    def _delete_pill(self, date_key, pill):
+        uid = firebase_auth.verify_id_token(self.token)['uid']
+        key = pill['key']
+
+        removal = delete_pill_database(uid, self.token, key)
+
+        # Remove the entry locally
+        if removal and date_key in self.data_by_date:
+            self.data_by_date[date_key] = [i for i in self.data_by_date[date_key] if i["key"] != key]
+            
+            if not self.data_by_date[date_key]:
+                del self.data_by_date[date_key]
+
+        # Close dialog with medicine description
+        self.page.dialog.open = False
+        self.page.update()
+
+        # Rebuild the calendar and update the UI inside UserControl
+        self._generate_calendar()
+        self.update()
+
 
     # Functions to go one month forward or back
     def prev_month(self, e):
