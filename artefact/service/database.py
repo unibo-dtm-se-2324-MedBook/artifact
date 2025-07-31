@@ -38,3 +38,19 @@ def load_medicines_for_user(uid, id_token, year, month):
                     data_by_date[date_str] = []
                 data_by_date[date_str].append(pill)
     return data_by_date
+
+
+def delete_pill_database(uid, id_token, key):
+    try:
+        db.child("users") \
+          .child(uid) \
+          .child("medicines") \
+          .child(key) \
+          .remove(id_token)
+        
+        print(f'Successfully removed record {key}')
+        return True
+    
+    except Exception as e:
+        print(f'Failed to remove record {key}: {e}')
+        return False
