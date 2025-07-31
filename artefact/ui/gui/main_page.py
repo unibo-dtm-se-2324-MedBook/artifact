@@ -627,25 +627,29 @@ class MainPage(UserControl):
     def handle_dismissal(self, e):
         self.page.add(Text(f"DatePicker dismissed"))
         
-
+    # Function to save new medicine in database and to show it in the calendar
     def save_medicine(self):
         pill_name = self.medname_field.value
         pill_qty = self.qty_field.value
-        # date = self.date_picker.value.strftime('%Y-%m-%d')
         pill_date = self.selected_date.value
         pill_note = self.note_field.value
 
         if pill_name and pill_qty and pill_date:
-            save_pill_database(self.user_uid, self.token, pill_name, pill_qty, pill_date, pill_note)
+            new_key = save_pill_database(self.user_uid, self.token, pill_name, pill_qty, pill_date, pill_note)
+
             self.form.open = False
             self.page.snack_bar = SnackBar(Text('Medicine saved'))
             self.page.snack_bar.open = True
             self.page.update()
 
-            # Update local storage: add a new entry to self.data_by_date
-            key = pill_date
-            entry = {'medicine_name': pill_name, 'quantity': pill_qty, 'note': pill_note}
-            self.data_by_date.setdefault(key, []).append(entry)
+            # Update local dictionary and generate the calendar with new medicine
+            entry = {
+                'key': new_key,
+                'medicine_name': pill_name,
+                'quantity': pill_qty,
+                'note': pill_note
+            }
+            self.data_by_date.setdefault(pill_date, []).append(entry)
             self._generate_calendar()
             self.update()
         else:
