@@ -367,6 +367,55 @@ class MainPage(UserControl):
         self.calendar.content.controls = rows
 
     def open_day_dialog(self, day):
+        date_key = f'{self.year}-{self.month:02d}-{day:02d}'
+        pills = self.data_by_date.get(date_key, [])
+
+        list_view = ListView(
+            expand = True,
+            spacing = 10,
+            padding = padding.all(0),
+        )
+        
+        for pill in pills:
+            list_view.controls.append(
+                Container(
+                    width = btn_width,
+                    bgcolor = minor_light_bgcolor,
+                    border = border.all(1, unit_color_dark),
+                    border_radius = 10,
+                    padding = padding.all(5),
+                    margin = padding.all(0),
+                    alignment = alignment.center,
+                    content = Text(pill['medicine_name'], size = general_txt_size),
+                    on_click = lambda e, p = pill: self.show_med_detail(date_key, p)
+                )
+            )
+
+        med_list_dialog = AlertDialog(
+            bgcolor = minor_light_bgcolor,
+            inset_padding = padding.symmetric(horizontal = 20, vertical = 20),
+            
+            title = Container(
+                alignment = alignment.center,
+                content = Text(f'{calendar.month_name[self.month]} {day:02d}', size = 18,) # weight = FontWeight.BOLD
+            ),
+            title_padding = padding.only(top = 20, bottom = 10),
+
+            content_padding = padding.only(top = 0, left = 20, right = 20),
+            content = Column(controls = [Divider(thickness = 2, color = unit_color_dark), list_view], spacing = 20),
+            actions = [TextButton(
+                content = Text('Close', size = general_txt_size, color = unit_color_dark), 
+                on_click = lambda e: self._close_dialog()
+            )]
+        )
+        self.page.dialog = med_list_dialog
+        med_list_dialog.open = True
+        self.page.update()
+
+    def show_med_detail(date_key, p):
+        pass 
+
+    def _close_dialog():
         pass
     
     # Functions to go one month forward or back
