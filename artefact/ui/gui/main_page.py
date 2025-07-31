@@ -415,8 +415,12 @@ class MainPage(UserControl):
     def show_med_detail(date_key, p):
         pass 
 
-    def _close_dialog():
-        pass
+    # Function to close the Dialog of the page    
+    def _close_dialog(self):
+        if self.page.dialog:
+            self.page.dialog.open = False
+            self.page.update()
+
     
     # Functions to go one month forward or back
     def prev_month(self, e):
@@ -524,7 +528,7 @@ class MainPage(UserControl):
                                 shape = RoundedRectangleBorder(radius=10),
                                 bgcolor = Dark_bgcolor,
                             ),
-                            on_click = lambda _: self.close_form()
+                            on_click = lambda _: self._close_dialog()
                         ),
                         TextButton(
                             content=Text('Save', size = general_txt_size, color = Colors.WHITE),
@@ -551,10 +555,6 @@ class MainPage(UserControl):
     def handle_dismissal(self, e):
         self.page.add(Text(f"DatePicker dismissed"))
         
-    # 'Cancel' button: function to close the Form of adding new medicine
-    def close_form(self):
-        self.form.open = False
-        self.page.update()
 
     def save_medicine(self):
         pill_name = self.medname_field.value
