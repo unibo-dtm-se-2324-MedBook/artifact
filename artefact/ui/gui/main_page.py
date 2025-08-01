@@ -3,6 +3,7 @@ from utils.traits import *
 from service.authentication import log_out
 import calendar
 import datetime as dt
+import asyncio
 from service.database import save_pill_database, load_medicines_for_user, delete_pill_database
 from firebase_admin import auth as firebase_auth
 
@@ -19,7 +20,7 @@ class MainPage(UserControl):
         self.user_uid = ''
 
         # Notification settings
-        self.unread_notif = True
+        self.unread_notif = False
         self.notifications = []
         self.btn_notif = IconButton(
             icon = icons.NOTIFICATIONS_OUTLINED,
@@ -28,7 +29,7 @@ class MainPage(UserControl):
             height = 30,
             padding = padding.all(0),
             alignment = alignment.center,
-            icon_color = Colors.RED_900,
+            icon_color = Colors.BLACK,
             highlight_color ='#FFFAFA',
             on_click = lambda _: self.open_notifications_dialog()
         )
@@ -307,6 +308,25 @@ class MainPage(UserControl):
         self.schedule.update()
 
     # Notifications part
+    # did_mount is a life-cycle hook of your UserControl. 
+    # It is called automatically by the Flet engine after your control is first built and added to the page (i.e. after build() and the actual rendering)
+    def did_mount(self):
+        print('did_mount has run')
+        self.page.run_task(self._schedule_daily_reminders)
+    
+    async def _schedule_daily_reminders(self):
+        while True:
+            now = dt.datetime.now()
+            next_run = now.replace(hour = 6, minute = 0, second = 0, microsecond = 0)
+            if now >= next_run:
+                next_run += dt.timedelta(days = 1)
+            
+            delay_secs = (next_run - now).total_seconds()
+            await asyncio.sleep(delay_secs)
+
+            self.notifications.clear()
+            self._handle_daily_reminder()
+
     # Method will be called when the daily reminder is triggered
     def _handle_daily_reminder(self):
         today = self.today.strftime('%Y-%m-%d')
@@ -325,7 +345,6 @@ class MainPage(UserControl):
         self.unread_notif = True
         self.btn_notif.icon_color = Colors.RED_900
         self.update()
-        # Here you can also call a push to a phone if necessary
 
     def open_notifications_dialog(self):
         notifs = [
@@ -359,7 +378,7 @@ class MainPage(UserControl):
                     ListView(
                         expand = True,
                         spacing = 10,
-                        padding = padding.only(top = 0, left = 20, right = 20, bottom = 10), 
+                        padding = padding.only(top = 0, bottom = 10), 
                         controls = notifs)
                 ]
             ),
