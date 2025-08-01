@@ -18,7 +18,22 @@ class MainPage(UserControl):
         self.token = token
         self.user_uid = ''
 
-         # Creating a visual for navigation
+        # Notification settings
+        self.unread_notif = True
+        self.notifications = []
+        self.btn_notif = IconButton(
+            icon = icons.NOTIFICATIONS_OUTLINED,
+            icon_size = 25,
+            width = 30,
+            height = 30,
+            padding = padding.all(0),
+            alignment = alignment.center,
+            icon_color = Colors.RED_900,
+            highlight_color ='#FFFAFA',
+            on_click = lambda _: self.open_notifications_dialog()
+        )
+
+        # Creating a visual for navigation
         self.navig = Container(
             bgcolor = Dark_bgcolor,
             border_radius= b_radius,
@@ -126,6 +141,15 @@ class MainPage(UserControl):
         self.year = self.today.year
         self.month = self.today.month
 
+        # Tests with notification dialog
+        # day = self.today.day
+        # month = calendar.month_name[self.today.month]
+        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill"})
+        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill2"})
+        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill3"})
+        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill4"})
+
+
         self.prev_btn = IconButton(
             icons.ARROW_BACK, 
             icon_color = unit_color_dark, 
@@ -203,19 +227,17 @@ class MainPage(UserControl):
         # Combine visual elements of Schedule page
         schedule_content = Container(
             content = Column(
-                spacing = 5,
-                controls=[
+                spacing = 4,
+                controls = [
                     Row(
                         alignment = 'spaceBetween',
-                        controls=[
+                        controls = [
                             Container(
                                 on_click= self.shrink,
                                 content = Icon(icons.MENU, Colors.BLACK)
                             ),
                             Text(value = 'MedBook',  color = 'black'),
-                            Container(
-                                content = Icon(name = icons.NOTIFICATIONS_OUTLINED, color = Colors.BLACK)
-                            )
+                            self.btn_notif
                         ]
                     ),
                     Divider(),
@@ -269,6 +291,7 @@ class MainPage(UserControl):
 
         return self.content
 
+
     # Open navigation moving the schedule to the right
     def shrink(self, e):
         self.schedule.controls[0].width = 70
@@ -282,6 +305,86 @@ class MainPage(UserControl):
         self.schedule.controls[0].border_radius = b_radius
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
+
+    # Notifications part
+    # Method will be called when the daily reminder is triggered
+    def _handle_daily_reminder(self):
+        today = self.today.strftime('%Y-%m-%d')
+        day = self.today.day
+        month = calendar.month_name[self.today.month]
+        pills = load_medicines_for_user(self.user_uid, self.token, self.year, self.month).get(today, [])
+        
+        if not pills:
+            return
+        for p in pills:
+            self.notifications.append({
+                'date': f'{day:02d} {month}',
+                'medicine_name': p['medicine_name']
+            })
+
+        self.unread_notif = True
+        self.btn_notif.icon_color = Colors.RED_900
+        self.update()
+        # Here you can also call a push to a phone if necessary
+
+    def open_notifications_dialog(self):
+        notifs = [
+            Container(
+                content = Column(
+                    spacing = 0,
+                    controls = [
+                        Text(f'Today {n['date']}:', size = general_txt_size),
+                        Text(f"don't forget to take {n['medicine_name']}", size = general_txt_size),
+                    ]
+                ),
+                padding = padding.symmetric(vertical = 4, horizontal = 12),
+                border = border.all(1, unit_color_dark),
+                border_radius = 10
+            )
+            for n in self.notifications
+        ]
+        
+        notif_dialog = AlertDialog(
+            bgcolor = minor_light_bgcolor,
+            inset_padding = padding.symmetric(horizontal = 20, vertical = 20),
+
+            title = Text("Notifications", size = 18, text_align = 'center'),
+            title_padding = padding.only(top = 20, bottom = 10),
+
+            content_padding = padding.only(top = 0, left = 20, right = 20),
+            content = Column(
+                spacing = 10,
+                controls = [
+                    Divider(thickness = 2, color = unit_color_dark),
+                    ListView(
+                        expand = True,
+                        spacing = 10,
+                        padding = padding.only(top = 0, left = 20, right = 20, bottom = 10), 
+                        controls = notifs)
+                ]
+            ),
+
+            actions = [TextButton(
+                content = Text('Close', size = general_txt_size, color = unit_color_dark), 
+                on_click = lambda e: self._close_dialog()
+            )]
+        )
+        
+        self.unread_notif = False
+        self.btn_notif.icon_color = Colors.BLACK
+
+        self.page.dialog = notif_dialog
+        notif_dialog.open = True
+        self.page.update()
+        self.update()
+
+
+    # Function to close a Dialog of the page    
+    def _close_dialog(self):
+        if self.page.dialog:
+            self.page.dialog.open = False
+            self.page.update()
+
 
     # Functions to go one month forward or back
     def prev_month(self, e):
@@ -438,13 +541,6 @@ class MainPage(UserControl):
         self.page.dialog = med_list_dialog
         med_list_dialog.open = True
         self.page.update()
-
-    # Function to close a Dialog of the page    
-    def _close_dialog(self):
-        if self.page.dialog:
-            self.page.dialog.open = False
-            self.page.update()
-
 
     def _show_med_detail(self, date_key, pill):
         med_desctiption = AlertDialog(
@@ -631,6 +727,7 @@ class MainPage(UserControl):
         self.form.open = True
         self.page.update()
 
+    # Functions for DatePicker's working
     def handle_change(self, e):
         self.selected_date.value = e.control.value.strftime('%Y-%m-%d')
         self.page.update()
@@ -666,7 +763,7 @@ class MainPage(UserControl):
         else:
             self.page.snack_bar = SnackBar(Text('Please, fill all fields'))
             self.page.snack_bar.open = True
-            self.update()
+            self.page.update()
 
 
     # Function of exit clicking the "Exit" button in navigation
