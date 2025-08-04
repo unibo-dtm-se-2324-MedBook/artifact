@@ -21,7 +21,7 @@ class App(UserControl):
         super().__init__()
         page.window.width = base_width
         page.window.height = base_height
-        page.window_frameless = True #  окно без стандартной рамки, панели заголовка и кнопок управления окна, таких как минимизация, максимизация и закрытие
+        page.window_frameless = True #  a window without the standard frame, title bar, and window control buttons such as minimize, maximize, and close
         page.window_title_bar_buttons_hidden = True
         page.window_title_bar_hidden = True
         page.bgcolor = colors.TRANSPARENT
@@ -30,19 +30,15 @@ class App(UserControl):
         self.page = page
         self.page.spacing = 0
 
-        self.first_page = FirstPage(self)
-        self.login_page = LoginPage(self)
-        self.signup_page = SignUpPage(self)
+        self.first_page = FirstPage()
+        self.login_page = LoginPage()
+        self.signup_page = SignUpPage()
         self.main_page = MainPage()
         self.forgpassw_page = ForgPasswPage()
         self.settings_page = SettingsPage()
 
-        self.temp_email = '' # temporary email storage
-        self.token = ''
-
         page.on_route_change = self.route_change
         page.go("/first_page")
-        # page.go("/main_page")
 
     def route_change(self, route):
         self.page.controls.clear()
@@ -51,21 +47,12 @@ class App(UserControl):
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.first_page]))
         elif self.page.route == "/login_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.login_page]))
-            if self.temp_email:
-                self.login_page.set_email(self.temp_email)
-                self.temp_email = ''
         elif self.page.route == "/passw_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.forgpassw_page]))
         elif self.page.route == "/signup_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.signup_page]))
-            if self.temp_email:
-                self.signup_page.set_email(self.temp_email)
-                self.temp_email = ''
         elif self.page.route == "/main_page":
-            self.page.controls.clear()
-            shedule_page = MainPage(token=self.token)
-            self.main_page = shedule_page
-            self.page.add(WindowDrag(), Stack(expand=True, controls=[shedule_page]))
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.main_page]))
         elif self.page.route == "/settings_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.settings_page]))
         
