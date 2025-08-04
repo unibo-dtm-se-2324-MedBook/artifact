@@ -4,18 +4,15 @@ from utils.validation import Validator
 from service.authentication import check_email
 
 class FirstPage(Container):
-    # def __init__(self, page:Page):
-    def __init__(self, main):
+
+    def __init__(self):
         super().__init__()
-        self.expand = True # атрибут expand может управлять тем, как элемент будет расширяться или сжиматься в пределах контейнера. в библиотеке Flet атрибут expand может использоваться, чтобы заставить элемент (например, кнопку или текстовое поле) занимать все доступное пространство в родительском контейнере.        
-        self.offset = transform.Offset(0,0,) # для Flet Offset может быть использован для представления смещения в двумерной системе координат
-        
-        self.main = main
+        self.expand = True         
+        self.offset = transform.Offset(0,0,)
 
         self.validator = Validator()
         self.error_border = 'red'
 
-        # self.page = page
         self.email = None
         self.first_content = None
         self.content = None
@@ -30,7 +27,6 @@ class FirstPage(Container):
             Row(alignment='center', controls = [Text(value= 'MedBook', weight='bold',size = 20, color='white')]),
             Text(value= 'Health in a convenient format', weight='bold', size = 12, color='white'),
             Container(height = 3),
-            # self.email_input,
             Container(
                 height=txf_height,
                 bgcolor='white',
@@ -44,7 +40,6 @@ class FirstPage(Container):
                 border_radius = 10,
                 alignment= alignment.center,
                 content= Text(value='Continue', size = 14, color='white'),
-                # on_click= lambda _: self.page.go('/singup_page')
                 on_click = self.but_continue
             ),
             Container(height = 2)
@@ -87,13 +82,11 @@ class FirstPage(Container):
             self.email.update()
         else:
             email_input = self.email.value
-            # self.page.splash = ProgressBar()
-            # self.page.update()
             email_exist = check_email(email_input)
             if email_exist:
-                self.main.temp_email = self.email.value
+                self.page.session.set("email", self.email.value)
                 self.page.go('/login_page')
             else:
-                self.main.temp_email = self.email.value
+                self.page.session.set("email", self.email.value)
                 self.page.go('/signup_page')
             

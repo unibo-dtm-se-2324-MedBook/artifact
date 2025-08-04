@@ -4,14 +4,11 @@ from utils.validation import Validator
 from service.authentication import login_user, store_token
 
 class LoginPage(Container):
-    # def __init__(self, page:Page):
-    def __init__(self, main):
+
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
-        # self.page = page
-
-        self.main = main
 
         self.validator = Validator()
         self.error_border = 'red'
@@ -23,15 +20,11 @@ class LoginPage(Container):
         self.password = None
         self.login_content = None
         self.content = None
-
-    def set_email(self, email):
-        self.email = email
-
-        self.text_email.value = f'Email: {self.email}'
-
-        self.update()
     
     def build(self):
+        self.email = self.page.session.get('email')
+        self.text_email.value = f'Email: {self.email}'
+
         self.view_passw = Text(value= 'View', color = Dark_bgcolor)
         self.password = TextField(
             password = True,
@@ -141,13 +134,13 @@ class LoginPage(Container):
             self.page.update()
 
             token = login_user(email, password)
+            self.page.session.set('token', token)
+
             self.page.splash = None
             self.page.update()
 
             if token:
                 store_token(token)
-                self.main.token = token
-                # print(token)
                 self.page.go('/main_page')
             else:
                 self.page.snack_bar = SnackBar(Text('Invalid password'))

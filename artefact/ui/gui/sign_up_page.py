@@ -5,13 +5,11 @@ from service.authentication import create_user
 
 class SignUpPage(Container):
 
-    def __init__(self, main):
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
         
-        self.main = main  # save the reference to the main class (class App)
-
         self.validator = Validator()
         self.error_border = 'red'
 
@@ -31,11 +29,10 @@ class SignUpPage(Container):
 
         self.content = None
 
-    def set_email(self, email):
-        self.email.value = email
-        self.email.update()
 
-    def build(self):     
+    def build(self):  
+        self.email.value = self.page.session.get("email")
+
         self.sighup_content = Column(controls = [
             Row(alignment='center', controls = [Text(value= 'Sigh Up', weight='bold',size = 12, color='white')]),
             Column(
@@ -175,9 +172,6 @@ class SignUpPage(Container):
             email = self.email.value
             password = self.password.value
 
-            print(name, surname, email, password)
-
             create_user(name, surname, email, password)
-            self.main.temp_email = self.email.value
             self.page.go("/login_page")
             
