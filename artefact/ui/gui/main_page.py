@@ -1,22 +1,21 @@
 from flet import *
-from utils.traits import *
-from service.authentication import log_out
 import calendar
 import datetime as dt
 import asyncio
+from utils.traits import *
+from ui.gui.navigation import NavigationBar
 from service.database import save_pill_database, load_medicines_for_user, delete_pill_database
 from firebase_admin import auth as firebase_auth
 
 # class MainPage(Container):
 class MainPage(UserControl):
 
-    def __init__(self, token = None):
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.offset = transform.Offset(0,0,)
         
-        # self.token = ''
-        self.token = token
+        self.token = ''
         self.user_uid = ''
 
         # Notification settings
@@ -32,107 +31,6 @@ class MainPage(UserControl):
             icon_color = Colors.BLACK,
             highlight_color ='#FFFAFA',
             on_click = lambda _: self.open_notifications_dialog()
-        )
-
-        # Creating a visual for navigation
-        self.navig = Container(
-            bgcolor = Dark_bgcolor,
-            border_radius= b_radius,
-            padding = padding.only(top=10, left=8, bottom=5),
-            content = Column(controls = [
-                Row(spacing = 0,
-                    controls = [IconButton(
-                        icon = Icons.KEYBOARD_RETURN, icon_color='white', 
-                        on_click=self.restore, 
-                        icon_size=20, 
-                        highlight_color ='#FFFAFA')
-                    ],
-                ),
-                Container(
-                    padding = padding.only(left=15),
-                    content= Text("Your portable\nmedical card", size=15, weight="bold", color='white')
-                ),
-
-                Container(height=10),
-                Row(controls=[
-                    TextButton(
-                        on_click = self.restore,
-                        content = Row(controls = [
-                            Icon(icons.SCHEDULE, color="white60"),
-                            Text(value="Schedule",
-                                size=15,
-                                weight=FontWeight.W_300,
-                                color="white",
-                                font_family="poppins"
-                            )
-                        ])
-                    )
-                ]),
-
-                Container(height=5),
-                Row(controls=[
-                    TextButton(
-                        # on_click= self.go_to_page,
-                        content = Row(controls = [
-                            Icon(icons.EDIT_DOCUMENT, color="white60"),
-                            Text("Documents",
-                                size=15,
-                                weight=FontWeight.W_300,
-                                color="white",
-                                font_family="poppins"
-                            )
-                        ])
-                    )
-                ]),                            
-
-                Container(height=5),
-                Row(controls=[
-                    TextButton(
-                        # on_click= self.go_to_page,
-                        content = Row(controls = [
-                            Icon(icons.DOCUMENT_SCANNER, color="white60"),
-                            Text("Check",
-                                size=15,
-                                weight=FontWeight.W_300,
-                                color="white",
-                                font_family="poppins"
-                            )
-                        ])
-                    )
-                ]), 
-
-                Container(height = 5),
-                Row(controls=[
-                    TextButton(
-                        # on_click= self.go_to_page,
-                        content = Row(controls = [
-                            Icon(icons.PERSON_OUTLINE, color="white60"),
-                            Text(value="Personal info",
-                                size = 15,
-                                weight = FontWeight.W_300,
-                                color = "white",
-                                font_family = "poppins"
-                            )
-                        ])
-                    )
-                ]),
-                
-                Container(height = 20),
-                Row(controls=[
-                    TextButton(
-                        content = Row(controls = [
-                            Icon(icons.EXIT_TO_APP, color="white60"),
-                            Text("Exit",
-                                size = 15,
-                                weight = FontWeight.W_300,
-                                color = "white",
-                                font_family = "poppins"
-                            ) 
-                        ]),
-                        on_click = self.exit
-                    )
-                ])
-            ])
         )
 
         # Creating a visual for Schedule page
@@ -209,19 +107,14 @@ class MainPage(UserControl):
         self.form = None 
 
 
-    # def set_token(self, token):
-    #     self.token = token
-    #     self.update()
-
-
     def build(self):
         self.month_header = Text(f'{calendar.month_name[self.month]} {self.year}', size = general_txt_size, italic = True)
 
+        self.token = self.page.session.get("token")
         if self.token:
             self.user_uid = firebase_auth.verify_id_token(self.token)['uid']
-            print('uid = ', self.user_uid)
             self.data_by_date = load_medicines_for_user(self.user_uid, self.token, self.year, self.month)
-            print('After calling load_medicines_for_user', self.data_by_date)
+            # print('After calling load_medicines_for_user', self.data_by_date)
         else: print('token wasn"t found')
         self._generate_calendar()
 
@@ -278,6 +171,9 @@ class MainPage(UserControl):
             )]
         )
 
+        # Import navigation
+        navigation = NavigationBar(current_page = self.schedule)
+
         # Combine Navigation + Schedule
         self.content = Container(
             width = base_width, 
@@ -286,7 +182,7 @@ class MainPage(UserControl):
             border_radius = b_radius,
             expand = True,
             content = Stack(
-                controls = [self.navig, self.schedule]
+                controls = [navigation, self.schedule]
             )
         )
 
@@ -298,13 +194,6 @@ class MainPage(UserControl):
         self.schedule.controls[0].width = 70
         self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
-        self.schedule.update()
-
-    # Close navigation opening the schedule
-    def restore(self, e):
-        self.schedule.controls[0].width = base_width
-        self.schedule.controls[0].border_radius = b_radius
-        self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.schedule.update()
 
     # Notifications part
@@ -785,17 +674,6 @@ class MainPage(UserControl):
             self.page.update()
 
 
-    # Function of exit clicking the "Exit" button in navigation
-    def exit(self, e):
-        token = self.token
-        if token: 
-            log_out(token)
-            self.page.session.clear()
-            self.page.go('/first_page')
-        else:
-            self.page.snack_bar = SnackBar(Text('Something is wrong, try again'))
-            self.page.snack_bar.open = True
-            self.page.update() 
             
         
 
