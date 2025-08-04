@@ -1,5 +1,4 @@
 from flet import *
-# from flet_route import Router, Route, RouteContext
 
 from utils.traits import *
 from ui.gui.first_page import FirstPage
@@ -7,6 +6,7 @@ from ui.gui.login_page import LoginPage
 from ui.gui.sign_up_page import SignUpPage
 from ui.gui.main_page import MainPage
 from ui.gui.forgot_password_page import ForgPasswPage
+from ui.gui.settings_page import SettingsPage
 
 class WindowDrag(UserControl):
     def __init__(self):
@@ -35,28 +35,14 @@ class App(UserControl):
         self.signup_page = SignUpPage(self)
         self.main_page = MainPage()
         self.forgpassw_page = ForgPasswPage()
+        self.settings_page = SettingsPage()
 
         self.temp_email = '' # temporary email storage
         self.token = ''
 
-        # self.screen_views = Stack( # Stack используется для наложения (или "накладывания") различных элементов друг на друга
-        #     expand = True,
-        #     controls=[
-        #         self.first_page,
-        #         # self.login_page,
-        #         # self.signup_page,  
-        #         # self.main_page, 
-        #         # self.forgpassw_page, 
-        #     ]
-        # )
-
         page.on_route_change = self.route_change
         page.go("/first_page")
         # page.go("/main_page")
-        # self.building()
-    
-    # def building(self):
-    #     self.page.add(WindowDrag(), Stack(expand = True, controls=[self.first_page])) # self.screen_views)
 
     def route_change(self, route):
         self.page.controls.clear()
@@ -80,11 +66,8 @@ class App(UserControl):
             shedule_page = MainPage(token=self.token)
             self.main_page = shedule_page
             self.page.add(WindowDrag(), Stack(expand=True, controls=[shedule_page]))
-            
-            # self.page.add(WindowDrag(), Stack(expand=True, controls=[self.main_page]))
-            # if self.token:
-            #     self.main_page.set_token(self.token)
-            #     self.token = ''
+        elif self.page.route == "/settings_page":
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.settings_page]))
         
         self.page.update()
 
