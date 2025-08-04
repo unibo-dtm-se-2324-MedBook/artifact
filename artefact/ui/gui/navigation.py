@@ -70,7 +70,7 @@ class NavigationBar(UserControl):
 
         self.btn_user_sett = Row(controls=[
             TextButton(
-                on_click = lambda e: self.page.route == '/person_info_page' and self.restore(e) or self.page.go('/person_info_page'),
+                on_click = lambda e: self.page.route == '/settings_page' and self.restore(e) or self.page.go('/settings_page'),
                 content = Row(controls = [
                     Icon(icons.PERSON_OUTLINE, color="white60"),
                     Text(value="Personal info",
