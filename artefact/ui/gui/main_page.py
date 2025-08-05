@@ -1,13 +1,14 @@
 from flet import *
 import calendar
 import datetime as dt
-import asyncio
 from utils.traits import *
-from ui.gui.navigation import NavigationBar
+from ui.gui.components.navigation import NavigationBar
+from ui.gui.components.page_header import PageHeader
 from service.database import save_pill_database, load_medicines_for_user, delete_pill_database
 from firebase_admin import auth as firebase_auth
+from service.notifications import NotificationService
 
-# class MainPage(Container):
+
 class MainPage(UserControl):
 
     def __init__(self):
@@ -18,36 +19,12 @@ class MainPage(UserControl):
         self.token = ''
         self.user_uid = ''
 
-        # Notification settings
-        self.unread_notif = False
-        self.notifications = []
-        self.btn_notif = IconButton(
-            icon = icons.NOTIFICATIONS_OUTLINED,
-            icon_size = 25,
-            width = 30,
-            height = 30,
-            padding = padding.all(0),
-            alignment = alignment.center,
-            icon_color = Colors.BLACK,
-            highlight_color ='#FFFAFA',
-            on_click = lambda _: self.open_notifications_dialog()
-        )
-
-        # Creating a visual for Schedule page
+        # Visual for Calendar
         self.data_by_date = {}
-        ## Calendar
+
         self.today = dt.datetime.today()
         self.year = self.today.year
         self.month = self.today.month
-
-        # Tests with notification dialog
-        # day = self.today.day
-        # month = calendar.month_name[self.today.month]
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill"})
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill2"})
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill3"})
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill4"})
-
 
         self.prev_btn = IconButton(
             icons.ARROW_BACK, 
@@ -86,16 +63,12 @@ class MainPage(UserControl):
         self.calendar = Container(
             height = calendar_height,
             width = calendar_width,
-            # border = border.only(
-            #                 top = border.BorderSide(1, unit_color_dark),
-            #                 bottom = border.BorderSide(1, unit_color_dark)
-            # ),
             padding = padding.all(0),
             margin  = margin.all(0),
             content = Column(spacing = 0, tight = True, controls = [])
         )
 
-        ## Button to add new pill
+        # Button to add new pill
         self.btn_add_pill = ElevatedButton(
             content = Text('Add the pill', size = 14, color = Colors.WHITE),
             height = txf_height,
@@ -108,9 +81,16 @@ class MainPage(UserControl):
 
 
     def build(self):
+        # Import navigation
+        page_header = PageHeader(current_page = None)
+        
         self.month_header = Text(f'{calendar.month_name[self.month]} {self.year}', size = general_txt_size, italic = True)
 
         self.token = self.page.session.get("token")
+        if self.token and not self.page.session.get('reminders_started'):
+            notif_service = NotificationService(self.page, self.token, page_header = page_header)
+            self.page.overlay.append(notif_service)
+
         if self.token:
             self.user_uid = firebase_auth.verify_id_token(self.token)['uid']
             self.data_by_date = load_medicines_for_user(self.user_uid, self.token, self.year, self.month)
@@ -118,23 +98,13 @@ class MainPage(UserControl):
         else: print('token wasn"t found')
         self._generate_calendar()
 
+
         # Combine visual elements of Schedule page
         schedule_content = Container(
             content = Column(
                 spacing = 4,
                 controls = [
-                    Row(
-                        alignment = 'spaceBetween',
-                        controls = [
-                            Container(
-                                on_click= self.shrink,
-                                content = Icon(icons.MENU, Colors.BLACK)
-                            ),
-                            Text(value = 'MedBook',  color = 'black'),
-                            self.btn_notif
-                        ]
-                    ),
-                    Divider(),
+                    page_header,
                     Row(alignment = MainAxisAlignment.CENTER,
                         controls = [Text('Schedule', weight = FontWeight.BOLD, size = 16)]),
                     Row(alignment = 'spaceBetween',
@@ -171,6 +141,8 @@ class MainPage(UserControl):
             )]
         )
 
+        page_header.current_page = self.schedule
+
         # Import navigation
         navigation = NavigationBar(current_page = self.schedule)
 
@@ -187,111 +159,6 @@ class MainPage(UserControl):
         )
 
         return self.content
-
-
-    # Open navigation moving the schedule to the right
-    def shrink(self, e):
-        self.schedule.controls[0].width = 70
-        self.schedule.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
-        self.schedule.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
-        self.schedule.update()
-
-    # Notifications part
-    # did_mount is a life-cycle hook of your UserControl. 
-    # It is called automatically by the Flet engine after your control is first built and added to the page (i.e. after build() and the actual rendering)
-    def did_mount(self):
-        print('did_mount has run')
-        self.page.run_task(self._schedule_daily_reminders)
-    
-    async def _schedule_daily_reminders(self):
-        while True:
-            now = dt.datetime.now()
-            next_run = now.replace(hour = 6, minute = 0, second = 0, microsecond = 0)
-            if now >= next_run:
-                next_run += dt.timedelta(days = 1)
-            
-            delay_secs = (next_run - now).total_seconds()
-            await asyncio.sleep(delay_secs)
-
-            self.notifications.clear()
-            self._handle_daily_reminder()
-
-    # Method will be called when the daily reminder is triggered
-    def _handle_daily_reminder(self):
-        today = self.today.strftime('%Y-%m-%d')
-        day = self.today.day
-        month = calendar.month_name[self.today.month]
-        pills = load_medicines_for_user(self.user_uid, self.token, self.year, self.month).get(today, [])
-        
-        if not pills:
-            return
-        for p in pills:
-            self.notifications.append({
-                'date': f'{day:02d} {month}',
-                'medicine_name': p['medicine_name']
-            })
-
-        self.unread_notif = True
-        self.btn_notif.icon_color = Colors.RED_900
-        self.update()
-
-    def open_notifications_dialog(self):
-        notifs = [
-            Container(
-                content = Column(
-                    spacing = 0,
-                    controls = [
-                        Text(f'Today {n['date']}:', size = general_txt_size),
-                        Text(f"don't forget to take {n['medicine_name']}", size = general_txt_size),
-                    ]
-                ),
-                padding = padding.symmetric(vertical = 4, horizontal = 12),
-                border = border.all(1, unit_color_dark),
-                border_radius = 10
-            )
-            for n in self.notifications
-        ]
-        
-        notif_dialog = AlertDialog(
-            bgcolor = minor_light_bgcolor,
-            inset_padding = padding.symmetric(horizontal = 20, vertical = 20),
-
-            title = Text("Notifications", size = 18, text_align = 'center'),
-            title_padding = padding.only(top = 20, bottom = 10),
-
-            content_padding = padding.only(top = 0, left = 20, right = 20),
-            content = Column(
-                spacing = 10,
-                controls = [
-                    Divider(thickness = 2, color = unit_color_dark),
-                    ListView(
-                        expand = True,
-                        spacing = 10,
-                        padding = padding.only(top = 0, bottom = 10), 
-                        controls = notifs)
-                ]
-            ),
-
-            actions = [TextButton(
-                content = Text('Close', size = general_txt_size, color = unit_color_dark), 
-                on_click = lambda e: self._close_dialog()
-            )]
-        )
-        
-        self.unread_notif = False
-        self.btn_notif.icon_color = Colors.BLACK
-
-        self.page.dialog = notif_dialog
-        notif_dialog.open = True
-        self.page.update()
-        self.update()
-
-
-    # Function to close a Dialog of the page    
-    def _close_dialog(self):
-        if self.page.dialog:
-            self.page.dialog.open = False
-            self.page.update()
 
 
     # Functions to go one month forward or back
@@ -404,6 +271,8 @@ class MainPage(UserControl):
             rows.append(Row(spacing = 0, tight = True, controls = cells))
         self.calendar.content.controls = rows
 
+
+    # Method to open window with all medicines identified on chosen day
     def open_day_dialog(self, day):
         date_key = f'{self.year}-{self.month:02d}-{day:02d}'
         pills = self.data_by_date.get(date_key, [])
@@ -450,6 +319,13 @@ class MainPage(UserControl):
         med_list_dialog.open = True
         self.page.update()
 
+    # Function to close a Dialog of the page    
+    def _close_dialog(self):
+        if self.page.dialog:
+            self.page.dialog.open = False
+            self.page.update()
+
+    # Method to open window with descripttion of chosed medicine
     def _show_med_detail(self, date_key, pill):
         med_desctiption = AlertDialog(
             bgcolor = minor_light_bgcolor,
