@@ -7,6 +7,7 @@ from firebase_admin import auth as firebase_auth
 from firebase_admin import credentials
 import pickle # “Pickling” is the process whereby a Python object hierarchy is converted into a byte stream, and “unpickling” is the inverse operation, whereby a byte stream (from a binary file or bytes-like object) is converted back into an object hierarchy.
 import os # provides functions for interacting with the operating system
+from flet import SnackBar, Text
 
 
 SERVICE_ACCOUNT_FILE = os.environ.get("SERVICE_ACCOUNT_FILE", ".secrets/service_account.json")
@@ -77,6 +78,26 @@ def get_user_info(token):
     name = decoded_token.get('name') or "User"
     # return uid, email, name
     return name
+
+def change_user_info(name: str, surname: str, email: str, uid: str, page):
+  try:
+    firebase_auth.update_user(
+      uid = uid,
+      display_name = f'{name}_{surname}',
+      email = email
+    )
+    page.snack_bar = SnackBar(
+      content = Text('Info successfully updated'),
+      open = True,
+    )
+    page.update()
+
+  except firebase_auth.AuthError as e:
+    page.snack_bar = SnackBar(
+      content = Text(f'Error updating info: {str(e)}'),
+      open = True,
+    )
+    page.update()
 
 # Exit the account
 def log_out(token):
