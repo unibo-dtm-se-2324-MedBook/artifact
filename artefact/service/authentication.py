@@ -79,13 +79,21 @@ def get_user_info(token):
     # return uid, email, name
     return name
 
+# Update user information in authentication firebase
 def change_user_info(name: str, surname: str, email: str, uid: str, page):
   try:
+    # user_before = firebase_auth.get_user(uid)
+    # print('Before update:', user_before.display_name, user_before.email)
+
     firebase_auth.update_user(
       uid = uid,
       display_name = f'{name}_{surname}',
       email = email
     )
+
+    # user_after = firebase_auth.get_user(uid)
+    # print("After update:", user_after.display_name, user_after.email)
+
     page.snack_bar = SnackBar(
       content = Text('Info successfully updated'),
       open = True,
