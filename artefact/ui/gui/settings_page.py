@@ -23,6 +23,10 @@ class SettingsPage(UserControl):
         self.user_email = ''
         self.password = ''
 
+        self.text_user_name = Text(size = 12)
+        self.text_user_surname = Text(size = 12)
+        self.text_user_email = Text(size = 12)
+
         # Button to edit user info
         self.btn_edit_info = ElevatedButton(
             content = Text('Edit information', size = 14, color = Colors.WHITE),
@@ -37,41 +41,34 @@ class SettingsPage(UserControl):
         page_header = PageHeader(current_page = None)
         
         self.token = self.page.session.get('token')
-        decoded_token = firebase_auth.verify_id_token(self.token)
-        self.user_uid = decoded_token['uid']
         
         # Check the timer to start notification service only once
         if self.token and not self.page.session.get('reminders_started'):
             notif_service = NotificationService(self.page, self.token, page_header = page_header)
             self.page.overlay.append(notif_service)
 
-        user = firebase_auth.get_user(self.user_uid)
-        full_name = user.display_name or ''
-        if '_' in full_name:
-            self.user_name, self.user_surnname = full_name.split('_', 1)
-        else:
-            self.user_name, self.user_surnname = full_name, ''
-        self.user_email = user.email
-        # self.password = ''
 
-        def create_row_info(name_info, info_value):
+        decoded_token = firebase_auth.verify_id_token(self.token)
+        self.user_uid = decoded_token['uid']
+        self.load_user_info()
+
+        def create_row_info(name_info, text_control):
             return Row(alignment = MainAxisAlignment.START, 
                 controls = [
                     Text(name_info, size = general_txt_size, weight = FontWeight),
                     Container(
-                        # width = 100,
                         expand = True,
                         padding = padding.all(5),
                         border_radius = 10,
                         border = border.all(color = unit_color_dark, width = 1),
-                        content = Text(info_value, size = 12)
+                        content = text_control
                     )
                 ]
             )
-        row_user_name = create_row_info('Name:', self.user_name)
-        row_user_surname = create_row_info('Last name:', self.user_surname)
-        row_user_email = create_row_info('Email:', self.user_email)
-        # row_user_password = create_row_info('Password:', self.password)
+        row_user_name = create_row_info('Name:', self.text_user_name)
+        row_user_surname = create_row_info('Last name:', self.text_user_surname)
+        row_user_email = create_row_info('Email:', self.text_user_email)
+
 
         settings_content = Container(
             content = Column(
@@ -90,11 +87,9 @@ class SettingsPage(UserControl):
                                 row_user_name,
                                 row_user_surname,
                                 row_user_email,
-                                # row_user_password,
                             ]
                         )
                     ),
-                    # self.btn_edit_info
                     Container(
                         margin = padding.only(bottom = 15, top = 10), # b 20
                         content = self.btn_edit_info
@@ -142,6 +137,21 @@ class SettingsPage(UserControl):
         self.settings.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.settings.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
         self.settings.update()
+
+    def load_user_info(self):
+        user = firebase_auth.get_user(self.user_uid)
+    
+        full_name = user.display_name or ''
+        if '_' in full_name:
+            self.user_name, self.user_surname = full_name.split('_', 1)
+        else:
+            self.user_name, self.user_surname = full_name, ''
+        
+        self.user_email = user.email
+
+        self.text_user_name.value = self.user_name
+        self.text_user_surname.value = self.user_surname
+        self.text_user_email.value = user.email
 
     def edit_info_btn(self):
         def create_row_edit_info(name_info, hint_name):
@@ -253,11 +263,9 @@ class SettingsPage(UserControl):
 
             change_user_info(name, surname, email, self.user_uid, self.page)
 
-            # Update local attributes
-            self.user_name = name
-            self.user_surname = surname
-            self.user_email = email
-
+            self.load_user_info()
             self._close_dialog()
-            # self.update()
-            self.page.go(self.page.route)
+            
+            self.update()
+            
+
