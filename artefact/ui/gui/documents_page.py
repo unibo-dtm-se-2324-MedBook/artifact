@@ -84,5 +84,11 @@ class DocumentsPage(UserControl):
                 controls = [navigation, self.settings]
             )
         )
-
         return self.content
+
+    # Open navigation moving the documents page to the right
+    def shrink(self, e):
+        self.settings.controls[0].width = 70
+        self.settings.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
+        self.settings.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
+        self.settings.update()
