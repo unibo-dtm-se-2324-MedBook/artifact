@@ -14,6 +14,16 @@ class DocumentsPage(UserControl):
         self.token = ''
         # self.user_uid = ''
 
+        # Button to upload new file
+        self.btn_add_file = ElevatedButton(
+            content = Text('Add new file', size = general_txt_size, color = Colors.WHITE),
+            height = txf_height,
+            width = btn_width,
+            bgcolor = Dark_bgcolor,
+            style = ButtonStyle(shape = RoundedRectangleBorder(radius = 10)),
+            on_click = lambda _: self.upload_file()
+        )
+
 
     def build(self):
         page_header = PageHeader(current_page = None)
@@ -46,10 +56,10 @@ class DocumentsPage(UserControl):
                     #         ]
                     #     )
                     # ),
-                    # Container(
-                    #     margin = padding.only(bottom = 15, top = 10), # b 20
-                    #     content = self.btn_edit_info
-                    # )
+                    Container(
+                        margin = padding.only(bottom = 15, top = 10), # b 20
+                        content = self.btn_add_file
+                    )
                 ]
             )
         )
@@ -92,3 +102,7 @@ class DocumentsPage(UserControl):
         self.settings.controls[0].scale = transform.Scale(1, alignment=alignment.center_right)
         self.settings.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
         self.settings.update()
+
+
+    def upload_file(self):
+        pass
