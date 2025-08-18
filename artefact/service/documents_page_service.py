@@ -12,11 +12,15 @@ def upload_user_document(uid: str, token: str, file_path: str):
     blob = bucket.blob(unique_name)
     blob.upload_from_filename(file_path)
     blob.make_public()
-
     public_url = blob.public_url
 
-    db.reference(f'documents/{uid}').push({
+    db.child('users').child(uid).child('documents').push({
         'name': file_name,
         'url': public_url,
         'storage_path': unique_name
-    })
+    }, token)
+
+
+def load_user_documents(uid: str, token: str) -> dict:
+    documents = db.child('users').child(uid).child('documents').get(token)
+    return documents.val() if documents.each() else {}
