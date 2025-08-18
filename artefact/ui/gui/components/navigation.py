@@ -23,7 +23,7 @@ class NavigationBar(UserControl):
             content = Text('Your portable\nmedical card', size = 15, weight = 'bold', color = 'white')
         )
 
-        self.btn_to_shedule = Row(controls = [
+        self.btn_to_shedule_page = Row(controls = [
             TextButton(
                 on_click = lambda e: self.page.route == '/main_page' and self.restore(e) or self.page.go('/main_page'),
                 content = Row(controls = [
@@ -38,9 +38,9 @@ class NavigationBar(UserControl):
             )
         ])
         
-        self.btn_save_doc = Row(controls=[
+        self.btn_to_documents_page = Row(controls=[
             TextButton(
-                # on_click = lambda e: self.page.route == '/main_page' and self.restore(e) or self.page.go('/main_page'),
+                on_click = lambda e: self.page.route == '/documents_page' and self.restore(e) or self.page.go('/documents_page'),
                 content = Row(controls = [
                     Icon(icons.EDIT_DOCUMENT, color="white60"),
                     Text("Documents",
@@ -68,7 +68,7 @@ class NavigationBar(UserControl):
             )
         ])
 
-        self.btn_user_sett = Row(controls=[
+        self.btn_user_settings_page = Row(controls=[
             TextButton(
                 on_click = lambda e: self.page.route == '/settings_page' and self.restore(e) or self.page.go('/settings_page'),
                 content = Row(controls = [
@@ -108,13 +108,13 @@ class NavigationBar(UserControl):
                 self.btn_return,
                 self.navig_title,
                 Container(height = 10),
-                self.btn_to_shedule,
+                self.btn_to_shedule_page,
                 Container(height = 5),
-                self.btn_save_doc,                            
+                self.btn_to_documents_page,                            
                 Container(height = 5),
                 self.btn_check_pill, 
                 Container(height = 5),
-                self.btn_user_sett,
+                self.btn_user_settings_page,
                 Container(height = 20),
                 self.btn_exit
             ])
