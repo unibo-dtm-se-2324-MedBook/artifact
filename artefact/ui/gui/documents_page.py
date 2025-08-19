@@ -20,11 +20,10 @@ class DocumentsPage(UserControl):
 
         self.doc_grid = GridView(
             expand = True,
-            runs_count = 2,
-            max_extent = 260,
-            child_aspect_ratio = 1.0,
+            max_extent = base_width / 2 - 20,
             spacing = 10,
-            run_spacing = 10
+            run_spacing = 10,
+            child_aspect_ratio = 0.9
         )
 
         # Button to upload new file
@@ -76,10 +75,7 @@ class DocumentsPage(UserControl):
                     self.no_docs_text,
                     Container(
                         expand = True,
-                        # padding = padding.only(top = 10, bottom = 20),
-                        # content = Column(
-                        # spacing = 10,
-                        # controls = [
+                        padding = padding.only(top = 10, bottom = 20),
                         content = self.doc_grid
                     ),
                     Container(
@@ -154,7 +150,7 @@ class DocumentsPage(UserControl):
                 self.no_docs_text.visible = False
                 for doc_id, doc in documents.items():
                     self.doc_grid.controls.append(
-                        self._build_doc_tile(doc['name'], doc['url'], doc['storage_path'], doc_id)
+                        self._build_doc_card(doc['name'], doc['url'], doc['storage_path'], doc_id)
                     )
             else:
                 # self.no_docs_text.value = 'No documents uploaded yet'
@@ -169,8 +165,56 @@ class DocumentsPage(UserControl):
         self.update()
         print('def load_documents finished')
 
-    def _build_doc_tile(self, name, url, storage_path, doc_id):
-        pass
+    def _build_doc_card(self, name, url, storage_path, doc_id):
+        if name.lower().endswith(('.jpg', '.jpeg', '.png')):
+            preview = Icon(icons.IMAGE, size = 30)
+        else: 
+            preview = Icon(icons.PICTURE_AS_PDF, size = 30)
+
+        document_cell = Container(
+            # border = border.all(1, unit_color_dark),
+            # border_radius = 10,
+            # padding = padding.only(bottom = 2, right = 3),
+            content = Column(
+                spacing = 5,
+                tight = True,
+                horizontal_alignment = CrossAxisAlignment.CENTER,
+                controls = [
+                    preview,
+                    Text(name, size = 10, overflow = TextOverflow.ELLIPSIS, max_lines = 2),
+                    Row(
+                        alignment = MainAxisAlignment.SPACE_EVENLY,
+                        controls = [
+                            IconButton(
+                                icons.DOWNLOAD,
+                                icon_color = unit_color_dark, 
+                                icon_size = 20,
+                                width = 25,
+                                height = 25, 
+                                padding = padding.all(0),
+                                alignment = alignment.center,
+                                on_click = lambda _: self._download_file(name, url)
+                            ),
+                            IconButton(
+                                icons.DELETE,
+                                icon_color = unit_color_dark,
+                                icon_size = 20, 
+                                width = 25,
+                                height = 25,
+                                padding = padding.all(0),
+                                alignment = alignment.center,
+                                on_click = lambda _: self._delete_document(doc_id, storage_path)
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
+
+        return document_cell
     
-    def delete_document(self, doc_id, storage_path):
+    def _download_file(self, name, url):
+        pass
+
+    def _delete_document(self, doc_id, storage_path):
         pass
