@@ -3,7 +3,7 @@ from utils.traits import *
 from ui.gui.components.navigation import NavigationBar
 from ui.gui.components.page_header import PageHeader
 from service.notifications import NotificationService
-from firebase_admin import auth as firebase_auth
+from service.authentication import auth
 from service import documents_page_service
 
 class DocumentsPage(UserControl):
@@ -49,8 +49,14 @@ class DocumentsPage(UserControl):
         page_header = PageHeader(current_page = None)
         
         self.token = self.page.session.get('token')
-        decoded_token = firebase_auth.verify_id_token(self.token)
-        self.user_uid = decoded_token['uid']
+
+        # decoded_token = firebase_auth.verify_id_token(self.token)
+        # self.user_uid = decoded_token['uid']
+        user = auth.get_account_info(self.token)
+        print(user)
+        self.user_uid = user['users'][0]['localId']
+
+        self.page.session.set('uid', self.user_uid)
         print('user_uid = ', self.user_uid)
 
         # Check the timer to start notification service only once
@@ -115,6 +121,8 @@ class DocumentsPage(UserControl):
             )
         )
 
+        
+        # self.page.run_task(self.load_documents)
         return self.content
 
     def did_mount(self):
@@ -129,8 +137,10 @@ class DocumentsPage(UserControl):
 
 
     def on_file_picked(self, e: FilePickerResultEvent):
+        print("File picker result:", e.files)
         if e.files:
             file_path = e.files[0].path
+            print("Picked file path:", file_path)
             documents_page_service.upload_user_document(self.user_uid, self.token, file_path)
             self.load_documents()
 
@@ -149,12 +159,12 @@ class DocumentsPage(UserControl):
             else:
                 # self.no_docs_text.value = 'No documents uploaded yet'
                 self.no_docs_text.visible = True
-                self.no_docs_text.update()
+                # self.no_docs_text.update()
 
         except Exception as e:
             self.no_docs_text.value = f'Failed to load documents: {e}'
             self.no_docs_text.visible = True
-            self.no_docs_text.update()
+            # self.no_docs_text.update()
 
         self.update()
         print('def load_documents finished')
