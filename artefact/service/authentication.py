@@ -12,7 +12,7 @@ from flet import SnackBar, Text
 
 SERVICE_ACCOUNT_FILE = os.environ.get("SERVICE_ACCOUNT_FILE", ".secrets/service_account.json")
 credential = credentials.Certificate(SERVICE_ACCOUNT_FILE)
-firebase_admin.initialize_app(credential, {'storageBucket': 'medbook-2bed9.appspot.com'})
+firebase_admin.initialize_app(credential, {'storageBucket': 'medbook-2bed9.firebasestorage.app'})
 
 FIREBASE_CONFIG_FILE = os.environ.get("FIREBASE_CONFIG_FILE", ".secrets/firebase.json")
 with open(FIREBASE_CONFIG_FILE) as f:
