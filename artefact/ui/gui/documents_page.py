@@ -18,6 +18,7 @@ class DocumentsPage(UserControl):
  
         self.no_docs_text = Text('No documents uploaded yet', size = general_txt_size, italic = True, color = colors.GREY, visible = False)
 
+        # Area for uploaded documents
         self.doc_grid = GridView(
             expand = True,
             max_extent = base_width / 2 - 20,
@@ -25,9 +26,10 @@ class DocumentsPage(UserControl):
             run_spacing = 10,
             child_aspect_ratio = 0.9
         )
+        self.file_picker_download = FilePicker(on_result = self.download_picked_file)
 
         # Button to upload new file
-        self.file_picker = FilePicker(on_result = self.on_file_picked)
+        self.file_picker_upload = FilePicker(on_result = self.on_file_picked)
         self.btn_add_file = ElevatedButton(
             content = Text('Add new file', size = general_txt_size, color = Colors.WHITE),
             height = txf_height,
@@ -35,7 +37,7 @@ class DocumentsPage(UserControl):
             bgcolor = Dark_bgcolor,
             style = ButtonStyle(shape = RoundedRectangleBorder(radius = 10)),
             # on_click = lambda _: self.upload_file()
-            on_click = lambda _: self.file_picker.pick_files(
+            on_click = lambda _: self.file_picker_upload.pick_files(
                 allow_multiple = False,
                 allowed_extensions = ['pdf', 'jpg', 'jpeg', 'png']
             )
@@ -43,7 +45,8 @@ class DocumentsPage(UserControl):
 
 
     def build(self):
-        self.page.overlay.append(self.file_picker)
+        self.page.overlay.append(self.file_picker_upload)
+        self.page.overlay.append(self.file_picker_download)
 
         page_header = PageHeader(current_page = None)
         
@@ -213,8 +216,21 @@ class DocumentsPage(UserControl):
 
         return document_cell
     
+    
+    # Functions to download files on the device
     def _download_file(self, name, url):
-        pass
+        self.pending_download = {'name': name, 'url': url, 'token': self.token}
+        self.file_picker_download.save_file(file_name = name)
 
+    # File_picker activity
+    def download_picked_file(self, e: FilePickerResultEvent):
+        if e.path and hasattr(self, 'pending_download'):
+            token = self.pending_download['token']
+            url = self.pending_download['url']
+            documents_page_service.download_file_from_url(url, e.path, token)
+            del self.pending_download
+
+
+    # Function to delete file from the app
     def _delete_document(self, doc_id, storage_path):
         pass
