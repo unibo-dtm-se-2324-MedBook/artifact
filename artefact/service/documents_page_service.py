@@ -4,6 +4,8 @@ import json
 from service.database import db
 import uuid
 import requests
+from service.admin_delete_from_storage import delete_file_from_storage
+
 
 
 FIREBASE_CONFIG_FILE = os.environ.get("FIREBASE_CONFIG_FILE", ".secrets/firebase.json")
@@ -69,3 +71,12 @@ def download_file_from_url(url, saved_path, token):
 
     except Exception as e:
         print(f'Download failed: {e}')
+
+
+def delete_user_document(uid: str, token: str, doc_id: str, storage_path: str):
+    try:
+        delete_file_from_storage(storage_path)
+        db.child('users').child(uid).child('documents').child(doc_id).remove(token)
+
+    except Exception as e:
+        print(f'Error while deleting document: {e}')
