@@ -172,10 +172,11 @@ class DocumentsPage(UserControl):
             content = Column(
                 spacing = 5,
                 tight = True,
-                horizontal_alignment = CrossAxisAlignment.CENTER,
+                horizontal_alignment = 'center', 
+                alignment = 'center',
                 controls = [
                     preview,
-                    Text(name, size = 10, overflow = TextOverflow.ELLIPSIS, max_lines = 2),
+                    Text(name, size = 10, overflow = TextOverflow.ELLIPSIS, max_lines = 2, text_align = 'center'),
                     Row(
                         alignment = MainAxisAlignment.SPACE_EVENLY,
                         controls = [
