@@ -7,7 +7,6 @@ import requests
 from service.admin_delete_from_storage import delete_file_from_storage
 
 
-
 FIREBASE_CONFIG_FILE = os.environ.get("FIREBASE_CONFIG_FILE", ".secrets/firebase.json")
 with open(FIREBASE_CONFIG_FILE) as f:
     firebaseConfig = json.load(f)
@@ -15,24 +14,16 @@ with open(FIREBASE_CONFIG_FILE) as f:
 firebase = pyrebase.initialize_app(firebaseConfig)
 storage = firebase.storage()
 
+
 def upload_user_document(uid: str, token: str, file_path: str):
-    print("upload_user_document called")
-    
     file_name = os.path.basename(file_path)
     unique_name = f'{uid}/{uuid.uuid4()}_{file_name}' # function from the uuid module that generates a random UUID version 4. Use it for a unique file name
-    print("Uploading file:", file_path)
-    print("Unique name:", unique_name)
 
-    # bucket = storage.bucket()
-    # blob = bucket.blob(unique_name)
-    # blob.upload_from_filename(file_path)
-    # blob.make_public()
-    # public_url = blob.public_url
     storage.child(unique_name).put(file_path, token)
+
     public_url = storage.child(unique_name).get_url(token)
-    if "alt=media" not in public_url:
-        public_url += "&alt=media"
-    print("File uploaded to storage, public url:", public_url)
+    if 'alt = media' not in public_url:
+        public_url += '&alt=media'
 
     db.child('users').child(uid).child('documents').push({
         'name': file_name,
@@ -45,6 +36,7 @@ def load_user_documents(uid: str, token: str) -> dict:
     documents = db.child('users').child(uid).child('documents').get(token)
     return documents.val() if documents.each() else {}
 
+
 def download_file_from_url(url, saved_path, token):
     try:  
         headers = {'Authorization': f'Bearer {token}'}  
@@ -52,8 +44,6 @@ def download_file_from_url(url, saved_path, token):
         response.raise_for_status()
 
         content_type = response.headers.get('Content-Type', '')
-        # print('Content-Type:', content_type)
-
         if 'image/jpeg' in content_type:
             ext = '.jpg'
         elif 'image/png' in content_type:
