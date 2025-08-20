@@ -36,7 +36,6 @@ class DocumentsPage(UserControl):
             width = btn_width,
             bgcolor = Dark_bgcolor,
             style = ButtonStyle(shape = RoundedRectangleBorder(radius = 10)),
-            # on_click = lambda _: self.upload_file()
             on_click = lambda _: self.file_picker_upload.pick_files(
                 allow_multiple = False,
                 allowed_extensions = ['pdf', 'jpg', 'jpeg', 'png']
@@ -51,15 +50,9 @@ class DocumentsPage(UserControl):
         page_header = PageHeader(current_page = None)
         
         self.token = self.page.session.get('token')
-
-        # decoded_token = firebase_auth.verify_id_token(self.token)
-        # self.user_uid = decoded_token['uid']
         user = auth.get_account_info(self.token)
-        print(user)
         self.user_uid = user['users'][0]['localId']
-
         self.page.session.set('uid', self.user_uid)
-        print('user_uid = ', self.user_uid)
 
         # Check the timer to start notification service only once
         if self.token and not self.page.session.get('reminders_started'):
@@ -121,7 +114,6 @@ class DocumentsPage(UserControl):
         )
 
         
-        # self.page.run_task(self.load_documents)
         return self.content
 
     def did_mount(self):
@@ -135,19 +127,20 @@ class DocumentsPage(UserControl):
         self.documents.update()
 
 
+    # Logic action of file picker clicking the 'Add new file' button
     def on_file_picked(self, e: FilePickerResultEvent):
         print("File picker result:", e.files)
         if e.files:
             file_path = e.files[0].path
-            # print("Picked file path:", file_path)
             documents_page_service.upload_user_document(self.user_uid, self.token, file_path)
             self.load_documents()
 
+
+    # Function to show uploaded files on the page
     def load_documents(self):
         self.doc_grid.controls.clear()
         try:
             documents = documents_page_service.load_user_documents(self.user_uid, self.token)
-            # print('Documents loaded:', documents)
 
             if documents:
                 self.no_docs_text.visible = False
@@ -156,18 +149,16 @@ class DocumentsPage(UserControl):
                         self._build_doc_card(doc['name'], doc['url'], doc['storage_path'], doc_id)
                     )
             else:
-                # self.no_docs_text.value = 'No documents uploaded yet'
                 self.no_docs_text.visible = True
-                # self.no_docs_text.update()
 
         except Exception as e:
             self.no_docs_text.value = f'Failed to load documents: {e}'
             self.no_docs_text.visible = True
-            # self.no_docs_text.update()
 
         self.update()
         print('def load_documents finished')
 
+    # Creation of visual of file
     def _build_doc_card(self, name, url, storage_path, doc_id):
         if name.lower().endswith(('.jpg', '.jpeg', '.png')):
             preview = Icon(icons.IMAGE, size = 30)
@@ -234,7 +225,6 @@ class DocumentsPage(UserControl):
     # Function to delete file from the app
     def _delete_document(self, doc_id, storage_path):
         try:
-            # print('storage_path', storage_path)
             documents_page_service.delete_user_document(self.user_uid, self.token, doc_id, storage_path)
             self.load_documents()
 
