@@ -139,7 +139,7 @@ class DocumentsPage(UserControl):
         print("File picker result:", e.files)
         if e.files:
             file_path = e.files[0].path
-            print("Picked file path:", file_path)
+            # print("Picked file path:", file_path)
             documents_page_service.upload_user_document(self.user_uid, self.token, file_path)
             self.load_documents()
 
@@ -147,7 +147,7 @@ class DocumentsPage(UserControl):
         self.doc_grid.controls.clear()
         try:
             documents = documents_page_service.load_user_documents(self.user_uid, self.token)
-            print('Documents loaded:', documents)
+            # print('Documents loaded:', documents)
 
             if documents:
                 self.no_docs_text.visible = False
@@ -233,4 +233,18 @@ class DocumentsPage(UserControl):
 
     # Function to delete file from the app
     def _delete_document(self, doc_id, storage_path):
-        pass
+        try:
+            # print('storage_path', storage_path)
+            documents_page_service.delete_user_document(self.user_uid, self.token, doc_id, storage_path)
+            self.load_documents()
+
+            self.page.snack_bar = SnackBar(Text('Document successfully deleted'))
+            self.page.snack_bar.open = True
+            self.page.update()
+
+        except Exception as e:
+            print(f'Failed to delete document: {e}')
+
+            self.page.snack_bar = SnackBar(Text('Failed to delete document'))
+            self.page.snack_bar.open = True
+            self.page.update()
