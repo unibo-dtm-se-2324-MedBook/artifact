@@ -55,7 +55,7 @@ class NavigationBar(UserControl):
 
         self.btn_check_pill = Row(controls=[
             TextButton(
-                # on_click = lambda e: self.page.route == '/main_page' and self.restore(e) or self.page.go('/main_page'),
+                on_click = lambda e: self.page.route == '/pill_check_page' and self.restore(e) or self.page.go('/pill_check_page'),
                 content = Row(controls = [
                     Icon(icons.DOCUMENT_SCANNER, color="white60"),
                     Text("Check",
