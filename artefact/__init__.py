@@ -8,6 +8,7 @@ from ui.gui.main_page import MainPage
 from ui.gui.forgot_password_page import ForgPasswPage
 from ui.gui.settings_page import SettingsPage
 from ui.gui.documents_page import DocumentsPage
+from ui.gui.medication_check_page import MedicineCheckPage
 
 class WindowDrag(UserControl):
     def __init__(self):
@@ -38,6 +39,7 @@ class App(UserControl):
         self.forgpassw_page = ForgPasswPage()
         self.settings_page = SettingsPage()
         self.documents_page = DocumentsPage()
+        self.medicine_check_page = MedicineCheckPage()
 
         page.on_route_change = self.route_change
         page.go("/first_page")
@@ -59,6 +61,8 @@ class App(UserControl):
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.settings_page]))
         elif self.page.route == "/documents_page":
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.documents_page]))
+        elif self.page.route == "/pill_check_page":
+            self.page.add(WindowDrag(), Stack(expand=True, controls=[self.medicine_check_page]))
         
         self.page.update()
 
