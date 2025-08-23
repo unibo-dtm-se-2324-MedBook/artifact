@@ -3,6 +3,7 @@ from utils.traits import *
 from ui.gui.components.navigation import NavigationBar
 from ui.gui.components.page_header import PageHeader
 from service.notifications import NotificationService
+from utils.constants import SEX_OPTIONS, COUNTRY_OPTIONS
 
 class MedicineCheckPage(UserControl):
     
@@ -27,6 +28,37 @@ class MedicineCheckPage(UserControl):
             on_click = lambda _: self.search_risks_btn()
         )
 
+        # Results area
+        self.results_caption = Text(size=12)
+        
+        self.results_chart_holder = Container(
+            content = Text('Chart will appear here', size = general_txt_size, italic = True),
+            alignment = alignment.center,
+            padding = padding.all(10),
+            visible = False
+        )
+
+        self.results_list = Column(
+            controls = [],
+            spacing = 4,
+            visible = False
+        )
+
+        self.results_section = Column(
+            # scroll = ScrollMode.AUTO,
+            # expand = True,
+            visible = False, 
+            controls = [
+                Divider(),
+                Text('Results', size = 16, weight = 'bold'),
+                self.results_caption,
+                self.results_chart_holder,
+                Divider(),
+                Text('Top reactions', size = 14, weight = 'bold'),
+                self.results_list,
+            ],
+        )
+
     
     def build(self):
         page_header = PageHeader(current_page = None)
@@ -39,30 +71,51 @@ class MedicineCheckPage(UserControl):
             notif_service = NotificationService(self.page, self.token, page_header = page_header)
             self.page.overlay.append(notif_service)
 
+        
+        row_drug, self.user_drug = self._create_txtfield_info('Drug:', 'Ibuprofen')
+        row_age, self.user_age = self._create_txtfield_info('Age (years):', '26')
+        row_weight, self.user_weight = self._create_txtfield_info('Weight (kg):', '60')
+        row_height, self.user_height = self._create_txtfield_info('Height (cm):', '176')
+
+        row_sex, self.user_sex = self._create_dropdown_info('Gender', SEX_OPTIONS)
+        row_country, self.user_country = self._create_dropdown_info('Country', COUNTRY_OPTIONS)
+
 
         medicine_check_content = Container(
             content = Column(
                 spacing = 4,
                 controls = [
                     page_header,
-                    Row(alignment = MainAxisAlignment.CENTER,
-                        controls = [Text('Medication Safety Check', weight = FontWeight.BOLD, size = 16)]
-                    ),
-                    Container(
+                    ListView(
                         expand = True,
-                        padding = padding.only(top = 10, bottom = 20),
-                        content = Column(
-                            spacing = 10,
-                            controls = [
-                                # row_user_name,
-                                # row_user_surname,
-                                # row_user_email,
-                            ]
-                        )
-                    ),
-                    Container(
-                        margin = padding.only(bottom = 15, top = 10),
-                        content = self.btn_search_risks
+                        spacing = 4,
+                        padding = padding.only(top = 0, bottom = 15, right=15),
+                        controls = [
+                            Row(alignment = MainAxisAlignment.CENTER,
+                                controls = [Text('MedCheck', weight = FontWeight.BOLD, size = 16)]
+                            ),
+                            Text('Please, enter your details', size = general_txt_size, italic = True),
+                            Container(
+                                expand = True,
+                                padding = padding.only(top = 10, bottom = 20),
+                                content = Column(
+                                    spacing = 10,
+                                    controls = [
+                                        row_drug,
+                                        row_sex,
+                                        row_age, 
+                                        row_weight, 
+                                        row_height,
+                                        row_country
+                                    ]
+                                )
+                            ),
+                            Container(
+                                margin = padding.only(bottom = 15,), # top = 10
+                                content = self.btn_search_risks
+                            ),
+                            # self.results_section
+                        ]
                     )
                 ]
             )
@@ -101,6 +154,7 @@ class MedicineCheckPage(UserControl):
 
         return self.content
     
+    
 
     # Open navigation moving the medicine check to the right
     def shrink(self, e):
@@ -109,7 +163,57 @@ class MedicineCheckPage(UserControl):
         self.settings.controls[0].border_radius = border_radius.only(top_left=35, top_right=0, bottom_left=35, bottom_right=0)
         self.settings.update()
 
+    # Creating TextField with common design for maintaining user information
+    def _create_txtfield_info(self, name_info, hint_name):
+            txt_field = TextField(
+                expand = True,
 
-    # 
-    def search_risks_btn():
-        pass
+                hint_text = hint_name,
+                hint_style = TextStyle(size = 12, color = input_hint_color),
+                text_style = TextStyle(size = 12, color = input_hint_color),
+                text_align = TextAlign.LEFT,
+
+                height = txf_height,
+                bgcolor = Colors.WHITE,
+                border_radius = 10,
+                border_color = unit_color_dark,
+                border_width = 1,
+                focused_border_color = unit_color_dark,
+                focused_border_width = 2
+            )
+            
+            return Row(alignment = MainAxisAlignment.START, 
+                controls = [
+                    Text(name_info, size = general_txt_size, weight = FontWeight),
+                    txt_field
+                ]
+            ), txt_field
+    
+    # Creating Dropdown with common design for maintaining user information
+    def _create_dropdown_info(self, name_info, from_list_name):
+            options_list = Dropdown(
+                # label = name_info,
+                options = [dropdown.Option(i['label'], i['value']) for i in from_list_name],
+                value = from_list_name[0]['label'] if from_list_name else None,
+                dense = True,
+                expand = True,
+                text_style = TextStyle(size = 12, color = input_hint_color),
+                hint_style = TextStyle(size = 12, color = input_hint_color),
+            )
+
+            return Row(alignment = MainAxisAlignment.START, 
+                controls = [
+                    Text(name_info, size = general_txt_size, weight = FontWeight),
+                    options_list
+                ]
+            ), options_list
+
+    # Function for generating a query to the API database by pressing a 'Search for risks' button
+    def search_risks_btn(self):
+        drug = self.user_drug.value
+        gender = self.user_sex.value
+        age = self.user_age.value
+        weight = self.user_weight.value
+        height = self.user_height.value
+        country = self.user_country.value
+
