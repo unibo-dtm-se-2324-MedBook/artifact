@@ -94,10 +94,10 @@ class MedicineCheckPage(UserControl):
                             Row(alignment = MainAxisAlignment.CENTER,
                                 controls = [Text('MedCheck', weight = FontWeight.BOLD, size = 16)]
                             ),
-                            Text('Please, enter your details', size = general_txt_size, italic = True),
+                            # Text('Please, enter your details', size = general_txt_size, italic = True),
                             Container(
                                 expand = True,
-                                padding = padding.only(top = 10, bottom = 20),
+                                padding = padding.only(top = 5, bottom = 5),
                                 content = Column(
                                     spacing = 10,
                                     controls = [
@@ -111,7 +111,7 @@ class MedicineCheckPage(UserControl):
                                 )
                             ),
                             Container(
-                                margin = padding.only(bottom = 15,), # top = 10
+                                margin = padding.only(bottom = 15),
                                 content = self.btn_search_risks
                             ),
                             # self.results_section
@@ -191,10 +191,10 @@ class MedicineCheckPage(UserControl):
     
     # Creating Dropdown with common design for maintaining user information
     def _create_dropdown_info(self, name_info, from_list_name):
+            options = [dropdown.Option(text = i['label'], key = str(i['value'])) for i in from_list_name]
             options_list = Dropdown(
-                # label = name_info,
-                options = [dropdown.Option(i['label'], i['value']) for i in from_list_name],
-                value = from_list_name[0]['label'] if from_list_name else None,
+                options = options,
+                value = None,
                 dense = True,
                 expand = True,
                 text_style = TextStyle(size = 12, color = input_hint_color),
@@ -204,7 +204,12 @@ class MedicineCheckPage(UserControl):
             return Row(alignment = MainAxisAlignment.START, 
                 controls = [
                     Text(name_info, size = general_txt_size, weight = FontWeight),
-                    options_list
+                    Container(
+                        expand = True,
+                        height = txf_height,
+                        clip_behavior = ClipBehavior.HARD_EDGE,
+                        content = options_list
+                    )
                 ]
             ), options_list
 
