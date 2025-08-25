@@ -5,6 +5,7 @@ from ui.gui.components.page_header import PageHeader
 from service.notifications import NotificationService
 from utils.validation import Validator
 from utils.constants import SEX_OPTIONS, COUNTRY_OPTIONS
+from service.api_openfda_service import PatientFilters, fetch_risks
 
 class MedicineCheckPage(UserControl):
     
@@ -37,13 +38,11 @@ class MedicineCheckPage(UserControl):
             content = Text('Chart will appear here', size = general_txt_size, italic = True),
             alignment = alignment.center,
             padding = padding.all(10),
-            visible = False
         )
 
         self.results_list = Column(
             controls = [],
             spacing = 4,
-            visible = False
         )
 
         self.results_section = Column(
@@ -73,7 +72,6 @@ class MedicineCheckPage(UserControl):
             notif_service = NotificationService(self.page, self.token, page_header = page_header)
             self.page.overlay.append(notif_service)
 
-        
         row_drug, self.user_drug = self._create_txtfield_info('Drug:', 'Ibuprofen')
         row_age, self.user_age = self._create_txtfield_info('Age (years):', '26')
         row_weight, self.user_weight = self._create_txtfield_info('Weight (kg):', '60')
@@ -115,7 +113,7 @@ class MedicineCheckPage(UserControl):
                                 margin = padding.only(bottom = 15),
                                 content = self.btn_search_risks
                             ),
-                            # self.results_section
+                            self.results_section
                         ]
                     )
                 ]
@@ -154,7 +152,6 @@ class MedicineCheckPage(UserControl):
         )
 
         return self.content
-    
     
 
     # Open navigation moving the medicine check to the right
@@ -217,28 +214,78 @@ class MedicineCheckPage(UserControl):
 
     # Function for generating a query to the API database by pressing a 'Search for risks' button
     def search_risks_btn(self):
+        is_valid = True
+
         if not self.validator.drug_name_correctness(self.user_drug.value):
             self.user_drug.border_color = self.error_border
             self.user_drug.update()
-        if not self.validator.drug_name_correctness(self.user_age.value):
+            is_valid = False
+        if not self.validator.age_weight_height_correctness(self.user_age.value):
             self.user_age.border_color = self.error_border
             self.user_age.update()
-        if not self.validator.drug_name_correctness(self.user_weight.value):
+            is_valid = False
+        if not self.validator.age_weight_height_correctness(self.user_weight.value):
             self.user_weight.border_color = self.error_border
             self.user_weight.update()
+            is_valid = False
+        if not self.validator.age_weight_height_correctness(self.user_height.value):
+            self.user_height.border_color = self.error_border
+            self.user_height.update()
+            is_valid = False
         if not self.validator.validate_dropdown(self.user_sex):
             self.container_user_sex.border = border.all(1, self.error_border)
             self.container_user_sex.border_radius = 5
             self.container_user_sex.update()
+            is_valid = False
         if not self.validator.validate_dropdown(self.user_country):
             self.container_user_country.border = border.all(1, self.error_border)
             self.container_user_country.border_radius = 5
             self.container_user_country.update()
-        else:
-            drug = self.user_drug.value
-            age = self.user_age.value
-            weight = self.user_weight.value
-            height = self.user_height.value
-            gender = self.user_sex.value
-            country = self.user_country.value
+            is_valid = False
 
+        if not is_valid:
+            return    
+        else:
+            self.btn_search_risks.disabled = True
+            self.btn_search_risks.update()
+
+            try:
+                filters = PatientFilters(
+                    gender = int(self.user_sex.value),
+                    age = float(self.user_age.value),
+                    weight = float(self.user_weight.value),
+                    height = float(self.user_height.value),
+                    country = self.user_country.value or None,
+                    age_window = 2.0,           # +- 2 years
+                    weight_window_pct = 0.10,   # +- 10%
+                    height_window_pct = 0.05,   # +- 5%
+                )
+
+                result = fetch_risks(
+                    drug_query = self.user_drug.value,
+                    filters = filters,
+                    # top_n = 6,
+                    # suspect_only = True,
+                    # api_key = None,
+                    # timeout_sec = 30
+                )
+
+                self.results_caption.value = f"Total results: {result.get('meta', {}).get('results', {}).get('total', 0)}"
+                self.results_list.controls.clear()
+                for item in result.get('results', []):
+                    term = item.get('term', '(unknown)')
+                    count = item.get('count', 0)
+                    self.results_list.controls.append(Text(f'{term}: {count}'))
+
+                self.results_section.visible = True
+                self.update()
+
+
+            except Exception as ex:
+                self.results_caption.value = f'Error: {ex}'
+                self.results_section.visible = True
+                self.update()
+
+            finally:
+                self.btn_search_risks.disabled = False
+                self.btn_search_risks.update()
