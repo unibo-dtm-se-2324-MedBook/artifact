@@ -33,7 +33,7 @@ class Validator():
             return False
         if not any(l.isdigit() for l in password):
             return False
-        if not re.search("[@_!#$%^&*()<>?/\|}{~:]", password):
+        if not re.search(r'[@_!#$%^&*()<>?/\\|}{~:]', password):
             return False
         return True 
     
@@ -44,7 +44,7 @@ class Validator():
             return False
         if any(l.isdigit() for l in drug_name):
             return False
-        if re.search("[@_!#$%^&*()<>?/\|}{~:]", drug_name):
+        if re.search(r'[@_!#$%^&*()<>?/\\|}{~:]', drug_name):
             return False
         return True 
     
