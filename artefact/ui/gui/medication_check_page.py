@@ -3,6 +3,7 @@ from utils.traits import *
 from ui.gui.components.navigation import NavigationBar
 from ui.gui.components.page_header import PageHeader
 from service.notifications import NotificationService
+from utils.validation import Validator
 from utils.constants import SEX_OPTIONS, COUNTRY_OPTIONS
 
 class MedicineCheckPage(UserControl):
@@ -12,7 +13,8 @@ class MedicineCheckPage(UserControl):
         self.expand = True
         self.offset = transform.Offset(0,0,)
 
-        # self.validator = Validator()
+        self.validator = Validator()
+        self.error_border = 'red'
 
         self.token = ''
         self.user_uid = ''
@@ -77,9 +79,8 @@ class MedicineCheckPage(UserControl):
         row_weight, self.user_weight = self._create_txtfield_info('Weight (kg):', '60')
         row_height, self.user_height = self._create_txtfield_info('Height (cm):', '176')
 
-        row_sex, self.user_sex = self._create_dropdown_info('Gender', SEX_OPTIONS)
-        row_country, self.user_country = self._create_dropdown_info('Country', COUNTRY_OPTIONS)
-
+        row_sex, self.user_sex, self.container_user_sex = self._create_dropdown_info('Gender', SEX_OPTIONS)
+        row_country, self.user_country, self.container_user_country = self._create_dropdown_info('Country', COUNTRY_OPTIONS)
 
         medicine_check_content = Container(
             content = Column(
@@ -200,25 +201,44 @@ class MedicineCheckPage(UserControl):
                 text_style = TextStyle(size = 12, color = input_hint_color),
                 hint_style = TextStyle(size = 12, color = input_hint_color),
             )
+            container_dd = Container(
+                expand = True,
+                height = txf_height,
+                clip_behavior = ClipBehavior.HARD_EDGE,
+                content = options_list
+            )
 
             return Row(alignment = MainAxisAlignment.START, 
                 controls = [
                     Text(name_info, size = general_txt_size, weight = FontWeight),
-                    Container(
-                        expand = True,
-                        height = txf_height,
-                        clip_behavior = ClipBehavior.HARD_EDGE,
-                        content = options_list
-                    )
+                    container_dd
                 ]
-            ), options_list
+            ), options_list, container_dd
 
     # Function for generating a query to the API database by pressing a 'Search for risks' button
     def search_risks_btn(self):
-        drug = self.user_drug.value
-        gender = self.user_sex.value
-        age = self.user_age.value
-        weight = self.user_weight.value
-        height = self.user_height.value
-        country = self.user_country.value
+        if not self.validator.drug_name_correctness(self.user_drug.value):
+            self.user_drug.border_color = self.error_border
+            self.user_drug.update()
+        if not self.validator.drug_name_correctness(self.user_age.value):
+            self.user_age.border_color = self.error_border
+            self.user_age.update()
+        if not self.validator.drug_name_correctness(self.user_weight.value):
+            self.user_weight.border_color = self.error_border
+            self.user_weight.update()
+        if not self.validator.validate_dropdown(self.user_sex):
+            self.container_user_sex.border = border.all(1, self.error_border)
+            self.container_user_sex.border_radius = 5
+            self.container_user_sex.update()
+        if not self.validator.validate_dropdown(self.user_country):
+            self.container_user_country.border = border.all(1, self.error_border)
+            self.container_user_country.border_radius = 5
+            self.container_user_country.update()
+        else:
+            drug = self.user_drug.value
+            age = self.user_age.value
+            weight = self.user_weight.value
+            height = self.user_height.value
+            gender = self.user_sex.value
+            country = self.user_country.value
 
