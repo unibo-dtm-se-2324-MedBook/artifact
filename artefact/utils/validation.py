@@ -56,3 +56,8 @@ class Validator():
         if not parameter.isdigit():
             return False
         return True 
+    
+    def validate_dropdown(self, drop_elem):
+        if not drop_elem.value:
+            return False
+        return True
