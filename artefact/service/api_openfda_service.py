@@ -24,8 +24,44 @@ class QueryResult:
     top_reactions: List[Dict[str, Any]] # list of dictionaries with reactions
     filters_used: Dict[str, Any] # filters that were actually applied
 
+def create_range(value, abs_window = 0.0, pers_window = 0.0) -> str:
+    if abs_window and abs_window > 0:
+        low = max(0, value - abs_window)
+        high = value + abs_window
+        return f'[{str(int(low))}+TO+{str(int(high))}]'
+    
+    if pers_window and pers_window > 0:
+        delta = value * pers_window
+        low = max(0, value - delta)
+        high = value + delta
+        return f'[{str(int(low))}+TO+{str(int(high))}]'
+    return str(int(value))
+
 def build_search(drug: str, filter: PatientFilters, suspect_only: bool = True) -> str:
-    pass 
+    drug_query = drug.replace('"', '\\"').strip()
+    
+    parts = []
+    parts.append('(' + ' OR '.join([
+        f'patient.drug.medicinalproduct:"{drug_query}"',
+        f'patient.drug.openfda.brand_name:"{drug_query}"',
+        f'patient.drug.openfda.substance_name:"{drug_query}"',
+    ]) + ')')
+
+    if suspect_only:
+        parts.append('patient.drug.drugcharacterization:1')
+    if filter.gender is not None:
+        parts.append(f'patient.patientsex:{int(filter.gender)}')
+    if filter.age is not None:
+        parts.append(f'patient.patientonsetageunit:{AGE_UNIT_YEARS}')
+        parts.append(f'patient.patientonsetage:{create_range(filter.age, abs_window = filter.age_window)}')
+    if filter.weight is not None:
+        parts.append(f'patient.patientweight:{create_range(filter.weight, pers_window = filter.weight_window_pct)}')
+    if filter.height is not None:
+        parts.append(f'patient.patientheight:{create_range(filter.height, pers_window = filter.height_window_pct)}')
+    if filter.country:
+        parts.append(f'occurcountry:{filter.country}')
+
+    return "+AND+".join(parts)  
 
 def fetch_risks(drug_query: str, filters: PatientFilters, top_n: int = DEFAULT_TOP_N, suspect_only: bool = True): # -> QueryResult:
     params = {
