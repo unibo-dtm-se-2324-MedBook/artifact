@@ -162,54 +162,66 @@ class MedicineCheckPage(UserControl):
 
     # Creating TextField with common design for maintaining user information
     def _create_txtfield_info(self, name_info, hint_name):
-            txt_field = TextField(
-                expand = True,
-
-                hint_text = hint_name,
-                hint_style = TextStyle(size = 12, color = input_hint_color),
-                text_style = TextStyle(size = 12, color = input_hint_color),
-                text_align = TextAlign.LEFT,
-
-                height = txf_height,
-                bgcolor = Colors.WHITE,
-                border_radius = 10,
-                border_color = unit_color_dark,
-                border_width = 1,
-                focused_border_color = unit_color_dark,
-                focused_border_width = 2
-            )
+        def _on_change(e, tf = None):
+            if tf and isinstance(tf.value, str) and tf.value.strip():
+                tf.border_color = unit_color_dark
+                tf.update()    
             
-            return Row(alignment = MainAxisAlignment.START, 
-                controls = [
-                    Text(name_info, size = general_txt_size, weight = FontWeight),
-                    txt_field
-                ]
-            ), txt_field
+        txt_field = TextField(
+            expand = True,
+
+            hint_text = hint_name,
+            hint_style = TextStyle(size = 12, color = input_hint_color),
+            text_style = TextStyle(size = 12, color = input_hint_color),
+            text_align = TextAlign.LEFT,
+
+            height = txf_height,
+            bgcolor = Colors.WHITE,
+            border_radius = 10,
+            border_color = unit_color_dark,
+            border_width = 1,
+            focused_border_color = unit_color_dark,
+            focused_border_width = 2,
+            on_change = lambda e: _on_change(e, tf = txt_field)
+        )
+        
+        return Row(alignment = MainAxisAlignment.START, 
+            controls = [
+                Text(name_info, size = general_txt_size, weight = FontWeight),
+                txt_field
+            ]
+        ), txt_field
     
     # Creating Dropdown with common design for maintaining user information
     def _create_dropdown_info(self, name_info, from_list_name):
-            options = [dropdown.Option(text = i['label'], key = str(i['value'])) for i in from_list_name]
-            options_list = Dropdown(
-                options = options,
-                value = None,
-                dense = True,
-                expand = True,
-                text_style = TextStyle(size = 12, color = input_hint_color),
-                hint_style = TextStyle(size = 12, color = input_hint_color),
-            )
-            container_dd = Container(
-                expand = True,
-                height = txf_height,
-                clip_behavior = ClipBehavior.HARD_EDGE,
-                content = options_list
-            )
+        def _on_dd_change(e, dd = None, wrapper = None):
+            if dd.value not in (None, ''):
+                wrapper.border = border.all(1, unit_color_dark)
+                wrapper.update()
+        
+        options = [dropdown.Option(text = i['label'], key = str(i['value'])) for i in from_list_name]
+        options_list = Dropdown(
+            options = options,
+            value = None,
+            dense = True,
+            expand = True,
+            text_style = TextStyle(size = 12, color = input_hint_color),
+            hint_style = TextStyle(size = 12, color = input_hint_color),
+        )
+        container_dd = Container(
+            expand = True,
+            height = txf_height,
+            clip_behavior = ClipBehavior.HARD_EDGE,
+            content = options_list
+        )
+        options_list.on_change = lambda e:_on_dd_change(e, options_list, container_dd)
 
-            return Row(alignment = MainAxisAlignment.START, 
-                controls = [
-                    Text(name_info, size = general_txt_size, weight = FontWeight),
-                    container_dd
-                ]
-            ), options_list, container_dd
+        return Row(alignment = MainAxisAlignment.START, 
+            controls = [
+                Text(name_info, size = general_txt_size, weight = FontWeight),
+                container_dd
+            ]
+        ), options_list, container_dd
 
     # Function for generating a query to the API database by pressing a 'Search for risks' button
     def search_risks_btn(self):
