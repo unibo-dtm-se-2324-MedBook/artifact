@@ -32,34 +32,35 @@ class MedicineCheckPage(UserControl):
         )
 
         # Results area
-        self.results_caption = Text(size=12)
+        # self.results_caption = Text(size=12)
         
-        self.results_chart_holder = Container(
-            content = Text('Chart will appear here', size = general_txt_size, italic = True),
-            alignment = alignment.center,
-            padding = padding.all(10),
-        )
+        # self.results_chart_holder = Container(
+        #     content = Text('Chart will appear here', size = general_txt_size, italic = True),
+        #     alignment = alignment.center,
+        #     padding = padding.all(10),
+        # )
 
-        self.results_list = Column(
-            controls = [],
-            spacing = 4,
-        )
+        # self.results_list = Column(
+        #     controls = [],
+        #     spacing = 4,
+        # )
 
-        self.results_section = Column(
+        # self.results_section = Column(
             # scroll = ScrollMode.AUTO,
             # expand = True,
-            visible = False, 
-            controls = [
-                Divider(),
-                Text('Results', size = 16, weight = 'bold'),
-                self.results_caption,
-                self.results_chart_holder,
-                Divider(),
-                Text('Top reactions', size = 14, weight = 'bold'),
-                self.results_list,
-            ],
-        )
+        #     visible = False, 
+        #     controls = [
+        #         Divider(),
+        #         Text('Results', size = 16, weight = 'bold'),
+        #         self.results_caption,
+        #         self.results_chart_holder,
+        #         Divider(),
+        #         Text('Top reactions', size = 14, weight = 'bold'),
+        #         self.results_list,
+        #     ],
+        # )
 
+        self.results_section = Column(spacing = 4, controls = [])
     
     def build(self):
         page_header = PageHeader(current_page = None)
@@ -80,43 +81,41 @@ class MedicineCheckPage(UserControl):
         row_sex, self.user_sex, self.container_user_sex = self._create_dropdown_info('Gender', SEX_OPTIONS)
         row_country, self.user_country, self.container_user_country = self._create_dropdown_info('Country', COUNTRY_OPTIONS)
 
-        medicine_check_content = Container(
-            content = Column(
-                spacing = 4,
-                controls = [
-                    page_header,
-                    ListView(
-                        expand = True,
-                        spacing = 4,
-                        padding = padding.only(top = 0, bottom = 15, right=15),
+        self.check_content = ListView(
+            expand = True,
+            spacing = 4,
+            padding = padding.only(top = 0, bottom = 15, right=15),
+            controls = [
+                Row(alignment = MainAxisAlignment.CENTER,
+                    controls = [Text('MedCheck', weight = FontWeight.BOLD, size = 16)]
+                ),
+                # Text('Please, enter your details', size = general_txt_size, italic = True),
+                Container(
+                    expand = True,
+                    padding = padding.only(top = 5, bottom = 5),
+                    content = Column(
+                        spacing = 10,
                         controls = [
-                            Row(alignment = MainAxisAlignment.CENTER,
-                                controls = [Text('MedCheck', weight = FontWeight.BOLD, size = 16)]
-                            ),
-                            # Text('Please, enter your details', size = general_txt_size, italic = True),
-                            Container(
-                                expand = True,
-                                padding = padding.only(top = 5, bottom = 5),
-                                content = Column(
-                                    spacing = 10,
-                                    controls = [
-                                        row_drug,
-                                        row_sex,
-                                        row_age, 
-                                        row_weight, 
-                                        row_height,
-                                        row_country
-                                    ]
-                                )
-                            ),
-                            Container(
-                                margin = padding.only(bottom = 15),
-                                content = self.btn_search_risks
-                            ),
-                            self.results_section
+                            row_drug,
+                            row_sex,
+                            row_age, 
+                            row_weight, 
+                            row_height,
+                            row_country
                         ]
                     )
-                ]
+                ),
+                Container(
+                    margin = padding.only(bottom = 15),
+                    content = self.btn_search_risks
+                ),
+                self.results_section
+            ])
+
+        page_content = Container(
+            content = Column(
+                spacing = 4,
+                controls = [page_header, self.check_content]
             )
         )
 
@@ -132,7 +131,7 @@ class MedicineCheckPage(UserControl):
                 animate_scale = animation.Animation(400, curve = 'decelerate'),
                 padding = padding.only(top = 15, left = 20, right = 40, bottom = 5), # 15
                 clip_behavior = ClipBehavior.ANTI_ALIAS,
-                content = medicine_check_content
+                content = page_content
             )]
         )
         
@@ -270,20 +269,58 @@ class MedicineCheckPage(UserControl):
                     # timeout_sec = 30
                 )
 
-                self.results_caption.value = f"Total results: {result.get('meta', {}).get('results', {}).get('total', 0)}"
-                self.results_list.controls.clear()
+                self.results_section.controls.clear()
+
+                total_res = result.get("meta", {}).get("results", {}).get("total", 0)
+                self.results_section.controls.extend([
+                    Divider(),
+                    Text('Results', size = 16, weight = 'bold'),
+                    Text(f'Total results: {total_res}', size = 12),
+                    # self.results_caption,
+                    # self.results_chart_holder,
+                    Divider(),
+                    Text('Top reactions', size = 14, weight = 'bold'),
+                    # self.results_list,
+                ])
+
+                lst = Column(spacing = 4)
                 for item in result.get('results', []):
                     term = item.get('term', '(unknown)')
                     count = item.get('count', 0)
-                    self.results_list.controls.append(Text(f'{term}: {count}'))
+                    lst.controls.append(
+                        Row(
+                            controls=[Text(term), Text(str(count))],
+                            alignment = MainAxisAlignment.SPACE_BETWEEN,
+                        )
+                    )
+                if not lst.controls:
+                    lst.controls.append(Text('No reactions found', italic = True))
 
-                self.results_section.visible = True
+                self.results_section.controls.append(lst)
                 self.update()
+
+                self.check_content.auto_scroll = True
+                self.check_content.update()
+                self.check_content.auto_scroll = False
+
+                # self.results_caption.value = f"Total results: {result.get('meta', {}).get('results', {}).get('total', 0)}"
+                # self.results_list.controls.clear()
+                # for item in result.get('results', []):
+                #     term = item.get('term', '(unknown)')
+                #     count = item.get('count', 0)
+                #     self.results_list.controls.append(Text(f'{term}: {count}'))
+
+                # self.results_section.visible = True
+                # self.update()
 
 
             except Exception as ex:
-                self.results_caption.value = f'Error: {ex}'
-                self.results_section.visible = True
+                self.results_section.controls.clear()
+                self.results_section.controls.extend([
+                    Divider(),
+                    Text('Results', size = 16, weight = FontWeight.BOLD),
+                    Text(f'Error: {ex}', italic = True),
+                ])
                 self.update()
 
             finally:
