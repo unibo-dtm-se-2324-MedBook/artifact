@@ -60,6 +60,7 @@ class MedicineCheckPage(UserControl):
         #     ],
         # )
 
+        self.results_anchor = Container(height = 1, key = 'results_anchor')
         self.results_section = Column(spacing = 4, controls = [])
     
     def build(self):
@@ -109,6 +110,7 @@ class MedicineCheckPage(UserControl):
                     margin = padding.only(bottom = 15),
                     content = self.btn_search_risks
                 ),
+                self.results_anchor,
                 self.results_section
             ])
 
@@ -197,6 +199,7 @@ class MedicineCheckPage(UserControl):
         def _on_dd_change(e, dd = None, wrapper = None):
             if dd.value not in (None, ''):
                 wrapper.border = border.all(1, unit_color_dark)
+                wrapper.border_radius = 5
                 wrapper.update()
         
         options = [dropdown.Option(text = i['label'], key = str(i['value'])) for i in from_list_name]
@@ -281,9 +284,25 @@ class MedicineCheckPage(UserControl):
                     # timeout_sec = 30
                 )
 
+                if isinstance(result, dict) and result.get('error'):
+                    self.results_section.controls.clear()
+                    self.results_section.controls.extend([
+                        Divider(),
+                        Text('Results', size = 16, weight = FontWeight.BOLD),
+                        Text(result['error']),
+                    ])
+                    self.page.update()
+
+                    try:
+                        self.check_content.scroll_to(key = 'results_anchor', duration = 400)
+                        self.page.update()
+                    except Exception as ex:
+                        print(f'Scroll error: {ex}')
+                    return
+
                 self.results_section.controls.clear()
 
-                total_res = result.get("meta", {}).get("results", {}).get("total", 0)
+                total_res = result.get('meta', {}).get('results', {}).get('total', 0)
                 self.results_section.controls.extend([
                     Divider(),
                     Text('Results', size = 16, weight = 'bold'),
@@ -307,23 +326,16 @@ class MedicineCheckPage(UserControl):
                     )
                 if not lst.controls:
                     lst.controls.append(Text('No reactions found', italic = True))
-
                 self.results_section.controls.append(lst)
-                self.update()
-
-                self.check_content.auto_scroll = True
+                
                 self.check_content.update()
-                self.check_content.auto_scroll = False
+                self.page.update()
 
-                # self.results_caption.value = f"Total results: {result.get('meta', {}).get('results', {}).get('total', 0)}"
-                # self.results_list.controls.clear()
-                # for item in result.get('results', []):
-                #     term = item.get('term', '(unknown)')
-                #     count = item.get('count', 0)
-                #     self.results_list.controls.append(Text(f'{term}: {count}'))
-
-                # self.results_section.visible = True
-                # self.update()
+                try:
+                    self.check_content.scroll_to(key = 'results_anchor', duration = 400)
+                    self.page.update()
+                except Exception as ex:
+                    print(f'Scroll error: {ex}')
 
 
             except Exception as ex:
