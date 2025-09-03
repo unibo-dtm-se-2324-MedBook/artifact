@@ -107,7 +107,7 @@ class MedicineCheckPage(UserControl):
                     )
                 ),
                 Container(
-                    margin = padding.only(bottom = 15),
+                    # margin = padding.only(bottom = 15),
                     content = self.btn_search_risks
                 ),
                 self.results_anchor,
@@ -287,9 +287,11 @@ class MedicineCheckPage(UserControl):
                 if isinstance(result, dict) and result.get('error'):
                     self.results_section.controls.clear()
                     self.results_section.controls.extend([
-                        Divider(),
-                        Text('Results', size = 16, weight = FontWeight.BOLD),
-                        Text(result['error']),
+                        Divider(thickness = 2, color = unit_color_dark),
+                        Row(alignment = MainAxisAlignment.CENTER,
+                            controls = [Text('Results', weight = FontWeight.BOLD, size = 16)]
+                        ),
+                        Text(result['error'], size = general_txt_size, text_align = TextAlign.JUSTIFY),
                     ])
                     self.page.update()
 
@@ -304,13 +306,15 @@ class MedicineCheckPage(UserControl):
 
                 total_res = result.get('meta', {}).get('results', {}).get('total', 0)
                 self.results_section.controls.extend([
-                    Divider(),
-                    Text('Results', size = 16, weight = 'bold'),
-                    Text(f'Total results: {total_res}', size = 12),
+                    Divider(thickness = 2, color = unit_color_dark),
+                    Row(alignment = MainAxisAlignment.CENTER,
+                        controls = [Text('Results', weight = FontWeight.BOLD, size = 16)]
+                    ),
+                    Text(f'Total results: {total_res}', size = 12, text_align = TextAlign.JUSTIFY),
                     # self.results_caption,
                     # self.results_chart_holder,
-                    Divider(),
-                    Text('Top reactions', size = 14, weight = 'bold'),
+                    Divider(thickness = 1, color = unit_color_dark),
+                    Text('Top reactions', size = general_txt_size, weight = 'bold'),
                     # self.results_list,
                 ])
 
@@ -320,12 +324,12 @@ class MedicineCheckPage(UserControl):
                     count = item.get('count', 0)
                     lst.controls.append(
                         Row(
-                            controls=[Text(term), Text(str(count))],
+                            controls = [Text(term), Text(str(count))],
                             alignment = MainAxisAlignment.SPACE_BETWEEN,
                         )
                     )
                 if not lst.controls:
-                    lst.controls.append(Text('No reactions found', italic = True))
+                    lst.controls.append(Text('No reactions found', italic = True, size = general_txt_size))
                 self.results_section.controls.append(lst)
                 
                 self.check_content.update()
