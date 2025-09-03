@@ -71,11 +71,50 @@ def fetch_risks(drug_query: str, filters: PatientFilters, top_n: int = DEFAULT_T
     }
     
     # GET request to API
-    resp = requests.get(OPENFDA_EVENT_URL, params = params, timeout = 30) # API response timeout - 30 sec 
+    try:
+        resp = requests.get(OPENFDA_EVENT_URL, params = params, timeout = 30) # API response timeout - 30 sec 
+        
+        if resp.status_code == 404:
+            print('Error 404 detected no results')
+            return {
+                'error': 'No results found.',
+                'status': 404,
+                'kind': 'no_results'
+            }      
 
-    if resp.status_code == 404: # If error 404 = 'no results'
-        return {}
-    resp.raise_for_status() # If other error -> throw exception
+        if resp.status_code == 405:
+            print('Error 405 - error on the API side')
+            return {
+                'error': 'External API error, please try again later.',
+                'status': 405,
+                'kind': 'api_error'
+            }
+
+        if resp.status_code == 429:
+            print('Error 429 - Request limit exceeded')
+            return {
+                'error': 'Too many requests, please slow down.',
+                'status': 429,
+                'kind': 'rate_limit'
+            }
+
+        if resp.status_code >= 500:
+            print(f'Error {resp.status_code} - server API error')
+            return {
+                'error': 'API server error, please try again later.',
+                'status': resp.status_code,
+                'kind': 'server_error'
+            }
+
+        resp.raise_for_status() # If other error -> throw exception
+        
+        data = resp.json()
+        return data
     
-    data = resp.json()
-    return data
+    except requests.exceptions.RequestException as ex:
+        print(f'Network/API error: {ex}')
+        return {
+            'error': 'Network or API error, please check your connection.',
+            'status': None,
+            'kind': 'network_error'
+        }
