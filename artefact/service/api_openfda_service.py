@@ -12,13 +12,9 @@ DEFAULT_TOP_N = 6
 class PatientFilters:
     gender: Optional[int] = None
     age: Optional[float] = None
-    weight: Optional[float] = None
-    height: Optional[float] = None
     country: Optional[str] = None
 
-    age_window: float = 0.0
-    weight_window_pct: float = 0.0
-    height_window_pct: float = 0.0   
+    age_window: float = 0.0  
 
     date_from: str = (datetime.date.today().replace(year = datetime.date.today().year - 5).strftime('%Y%m%d'))  
     date_to: str = datetime.date.today().strftime('%Y%m%d')
@@ -29,14 +25,10 @@ class QueryResult:
     top_reactions: List[Dict[str, Any]] # list of dictionaries with reactions
     filters_used: Dict[str, Any] # filters that were actually applied
 
-def create_range(value, abs_window = 0.0, pers_window = 0.0) -> str:
+def create_range(value, abs_window = 0.0) -> str:
     if abs_window and abs_window > 0:
         low = max(0, value - abs_window)
         high = value + abs_window
-    elif pers_window and pers_window > 0:
-        delta = value * pers_window
-        low = max(0, value - delta)
-        high = value + delta
     else: 
         return str(int(value))
     
@@ -60,10 +52,6 @@ def build_search(drug: str, filter: PatientFilters, suspect_only: bool = True) -
     if filter.age is not None:
         parts.append(f'patient.patientonsetageunit:{AGE_UNIT_YEARS}')
         parts.append(f'patient.patientonsetage:{create_range(filter.age, abs_window = filter.age_window)}')
-    if filter.weight is not None:
-        parts.append(f'patient.patientweight:{create_range(filter.weight, pers_window = filter.weight_window_pct)}')
-    if filter.height is not None:
-        parts.append(f'patient.patientheight:{create_range(filter.height, pers_window = filter.height_window_pct)}')
     if filter.country:
         if len(filter.country) == 2 and filter.country.isalpha():
             parts.append(f'occurcountry:"{filter.country}"')
@@ -86,7 +74,6 @@ def fetch_risks(drug_query: str, filters: PatientFilters, top_n: int = DEFAULT_T
         'count': 'patient.reaction.reactionmeddrapt.exact',
         'limit': max(1, top_n),
     }
-    
     # GET request to API
     try:
         _log_full_url(params)
@@ -128,7 +115,7 @@ def fetch_risks(drug_query: str, filters: PatientFilters, top_n: int = DEFAULT_T
     except requests.exceptions.RequestException as ex:
         print(f'Network/API error: {ex}')
         return {
-            'error': 'Network or API error, please check your connection.',
+            'error': 'Network or API error, please check your connection',
             'status': None,
             'kind': 'network_error'
         }

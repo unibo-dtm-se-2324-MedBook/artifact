@@ -76,8 +76,6 @@ class MedicineCheckPage(UserControl):
 
         row_drug, self.user_drug = self._create_txtfield_info('Drug:', 'Ibuprofen')
         row_age, self.user_age = self._create_txtfield_info('Age (years):', '26')
-        row_weight, self.user_weight = self._create_txtfield_info('Weight (kg):', '60')
-        row_height, self.user_height = self._create_txtfield_info('Height (cm):', '176')
 
         row_sex, self.user_sex, self.container_user_sex = self._create_dropdown_info('Gender', SEX_OPTIONS)
         row_country, self.user_country, self.container_user_country = self._create_dropdown_info('Country', COUNTRY_OPTIONS)
@@ -100,8 +98,6 @@ class MedicineCheckPage(UserControl):
                             row_drug,
                             row_sex,
                             row_age, 
-                            row_weight, 
-                            row_height,
                             row_country
                         ]
                     )
@@ -238,14 +234,6 @@ class MedicineCheckPage(UserControl):
             self.user_age.border_color = self.error_border
             self.user_age.update()
             is_valid = False
-        if not self.validator.age_weight_height_correctness(self.user_weight.value):
-            self.user_weight.border_color = self.error_border
-            self.user_weight.update()
-            is_valid = False
-        if not self.validator.age_weight_height_correctness(self.user_height.value):
-            self.user_height.border_color = self.error_border
-            self.user_height.update()
-            is_valid = False
         if not self.validator.validate_dropdown(self.user_sex):
             self.container_user_sex.border = border.all(1, self.error_border)
             self.container_user_sex.border_radius = 5
@@ -267,12 +255,8 @@ class MedicineCheckPage(UserControl):
                 filters = PatientFilters(
                     gender = int(self.user_sex.value),
                     age = float(self.user_age.value),
-                    weight = float(self.user_weight.value),
-                    height = float(self.user_height.value),
                     country = self.user_country.value or None,
-                    age_window = 2.0,           # +- 2 years
-                    weight_window_pct = 0.10,   # +- 10%
-                    height_window_pct = 0.05,   # +- 5%
+                    age_window = 2.0, # +- 2 years
                 )
 
                 result = fetch_risks(
