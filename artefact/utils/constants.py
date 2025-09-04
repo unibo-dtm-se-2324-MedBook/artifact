@@ -6,7 +6,7 @@ SEX_OPTIONS = [
 ]
 
 COUNTRY_OPTIONS = [
-    {"label": "Any", "value": None},
+    {"label": "Any", "value": ""},
     {"label": "Afghanistan (AF)", "value": "AF"},
     {"label": "Albania (AL)", "value": "AL"},
     {"label": "Algeria (DZ)", "value": "DZ"},
