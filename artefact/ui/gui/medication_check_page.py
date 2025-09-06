@@ -355,6 +355,13 @@ class MedicineCheckPage(UserControl):
                     result_title,
                     Text('Error: something went wrong. Please, try later', italic = True),
                 ])
+                
+                try:
+                    self.check_content.scroll_to(key='results_anchor', duration=400)
+                    self.page.update()
+                except Exception as scroll_ex:
+                    print(f'Scroll error: {scroll_ex}')
+
                 self.update()
 
             finally:
