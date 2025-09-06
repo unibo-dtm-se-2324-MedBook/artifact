@@ -355,3 +355,7 @@ class MedicineCheckPage(UserControl):
             finally:
                 self.btn_search_risks.disabled = False
                 self.btn_search_risks.update()
+
+    # Automatically cleaning the result section when go to other page
+    def will_unmount(self):
+        self.results_section.controls.clear()
