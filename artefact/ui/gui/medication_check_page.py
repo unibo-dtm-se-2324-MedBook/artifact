@@ -64,20 +64,20 @@ class MedicineCheckPage(UserControl):
         row_drug, self.user_drug = self._create_txtfield_info('Drug:', 'Ibuprofen')
         row_age, self.user_age = self._create_txtfield_info('Age (years):', '26')
 
-        row_sex, self.user_sex, self.container_user_sex = self._create_dropdown_info('Gender', SEX_OPTIONS)
-        row_country, self.user_country, self.container_user_country = self._create_dropdown_info('Country', COUNTRY_OPTIONS)
+        row_sex, self.user_sex, self.container_user_sex = self._create_dropdown_info('Gender:', SEX_OPTIONS)
+        row_country, self.user_country, self.container_user_country = self._create_dropdown_info('Country:', COUNTRY_OPTIONS)
 
         self.check_content = ListView(
             expand = True,
             spacing = 4,
-            padding = padding.only(top = 0, bottom = 15, right=15),
+            padding = padding.only(top = 0, bottom = 20, right = 40, left = 20),
             controls = [
                 self.title,
                 self.page_description,
                 self.txt_details,
                 Container(
                     expand = True,
-                    padding = padding.only(top = 5), #  bottom = 5
+                    padding = padding.only(top = 5),
                     content = Column(
                         spacing = 10,
                         controls = [
@@ -99,7 +99,12 @@ class MedicineCheckPage(UserControl):
         page_content = Container(
             content = Column(
                 spacing = 4,
-                controls = [page_header, self.check_content]
+                controls = [
+                    Container(
+                        content = page_header,
+                        padding = padding.only(left = 20, right = 40, top = 15)
+                    ), 
+                    self.check_content]
             )
         )
 
@@ -113,7 +118,7 @@ class MedicineCheckPage(UserControl):
                 border_radius = b_radius,
                 animate = animation.Animation(600, AnimationCurve.DECELERATE),
                 animate_scale = animation.Animation(400, curve = 'decelerate'),
-                padding = padding.only(top = 15, left = 20, right = 40, bottom = 5), # 15
+                # padding = padding.only(top = 15, left = 20, right = 40, bottom = 5), # 15
                 clip_behavior = ClipBehavior.ANTI_ALIAS,
                 content = page_content
             )]
