@@ -6,6 +6,7 @@ from service.notifications import NotificationService
 from utils.validation import Validator
 from utils.constants import SEX_OPTIONS, COUNTRY_OPTIONS
 from service.api_openfda_service import PatientFilters, fetch_risks
+from flet import PieChart, PieChartSection
 
 class MedicineCheckPage(UserControl):
     
@@ -18,48 +19,35 @@ class MedicineCheckPage(UserControl):
         self.error_border = 'red'
 
         self.token = ''
-        self.user_uid = ''
 
+        # Enter filters area
+        self.title = Row(
+            alignment = MainAxisAlignment.CENTER,
+            controls = [Text('MedCheck', weight = FontWeight.BOLD, size = title_txt_size)]
+        )
+        self.page_description = Text('Here you can check possible side effects of the medicine', 
+            size = helper_txt_size, text_align = TextAlign.JUSTIFY)
+        self.txt_details = Container(
+            padding = padding.only(top = 5, bottom = 5), # italic = True
+            content = Text('Please, enter your details', size = general_txt_size)
+        )
 
         # Button to search for risks
         self.btn_search_risks = ElevatedButton(
-            content = Text('Search for risks', size = 14, color = Colors.WHITE),
+            content = Text('Search for risks', size = general_txt_size, color = Colors.WHITE),
             height = txf_height,
             width = btn_width,
             bgcolor = Dark_bgcolor,
             style = ButtonStyle(shape = RoundedRectangleBorder(radius=10)),
-            on_click = lambda _: self.search_risks_btn()
+            on_click = lambda _: self.search_risks()
         )
 
         # Results area
-        # self.results_caption = Text(size=12)
-        
-        # self.results_chart_holder = Container(
-        #     content = Text('Chart will appear here', size = general_txt_size, italic = True),
-        #     alignment = alignment.center,
-        #     padding = padding.all(10),
-        # )
-
-        # self.results_list = Column(
-        #     controls = [],
-        #     spacing = 4,
-        # )
-
-        # self.results_section = Column(
-            # scroll = ScrollMode.AUTO,
-            # expand = True,
-        #     visible = False, 
-        #     controls = [
-        #         Divider(),
-        #         Text('Results', size = 16, weight = 'bold'),
-        #         self.results_caption,
-        #         self.results_chart_holder,
-        #         Divider(),
-        #         Text('Top reactions', size = 14, weight = 'bold'),
-        #         self.results_list,
-        #     ],
-        # )
-
+        self.results_chart_holder = Container(
+            expand = True,
+            alignment = alignment.center, 
+            padding = padding.symmetric(vertical = 0)
+        )
         self.results_anchor = Container(height = 1, key = 'results_anchor')
         self.results_section = Column(spacing = 4, controls = [])
     
@@ -67,7 +55,6 @@ class MedicineCheckPage(UserControl):
         page_header = PageHeader(current_page = None)
         
         self.token = self.page.session.get('token')
-        self.user_uid = self.page.session.get('uid')
 
         # Check the timer to start notification service only once
         if self.token and not self.page.session.get('reminders_started'):
@@ -85,13 +72,12 @@ class MedicineCheckPage(UserControl):
             spacing = 4,
             padding = padding.only(top = 0, bottom = 15, right=15),
             controls = [
-                Row(alignment = MainAxisAlignment.CENTER,
-                    controls = [Text('MedCheck', weight = FontWeight.BOLD, size = 16)]
-                ),
-                # Text('Please, enter your details', size = general_txt_size, italic = True),
+                self.title,
+                self.page_description,
+                self.txt_details,
                 Container(
                     expand = True,
-                    padding = padding.only(top = 5, bottom = 5),
+                    padding = padding.only(top = 5), #  bottom = 5
                     content = Column(
                         spacing = 10,
                         controls = [
@@ -103,7 +89,7 @@ class MedicineCheckPage(UserControl):
                     )
                 ),
                 Container(
-                    # margin = padding.only(bottom = 15),
+                    margin = padding.only(top = 15),
                     content = self.btn_search_risks
                 ),
                 self.results_anchor,
@@ -169,8 +155,8 @@ class MedicineCheckPage(UserControl):
             expand = True,
 
             hint_text = hint_name,
-            hint_style = TextStyle(size = 12, color = input_hint_color),
-            text_style = TextStyle(size = 12, color = input_hint_color),
+            hint_style = TextStyle(size = helper_txt_size, color = input_hint_color),
+            text_style = TextStyle(size = helper_txt_size, color = input_hint_color),
             text_align = TextAlign.LEFT,
 
             height = txf_height,
@@ -204,8 +190,8 @@ class MedicineCheckPage(UserControl):
             value = None,
             dense = True,
             expand = True,
-            text_style = TextStyle(size = 12, color = input_hint_color),
-            hint_style = TextStyle(size = 12, color = input_hint_color),
+            text_style = TextStyle(size = helper_txt_size, color = input_hint_color),
+            hint_style = TextStyle(size = helper_txt_size, color = input_hint_color),
         )
         container_dd = Container(
             expand = True,
@@ -222,8 +208,63 @@ class MedicineCheckPage(UserControl):
             ]
         ), options_list, container_dd
 
+    def _show_chart_reactions(self, risks: list):
+        total = sum(int(i.get("count", 0)) for i in risks)
+        if not risks or total == 0:
+            return
+        
+        sections = []
+        legend_rows = []
+        colors = ['#ABCDEF', "#66B0B6", "#EDC58C", "#F0DC8B", "#CAAAE8", "#EBAAB9"]
+        radius = 55
+
+        for idx, i in enumerate(risks):
+            term = (i.get('term') or '(unknown)').upper()
+            count = int(i.get('count', 0))
+            pct = round(100 * count / total, 1)
+            sections.append(
+                PieChartSection(
+                    value = count,
+                    title = f'{pct}%',
+                    color = colors[idx % len(colors)],
+                    radius = radius,
+                    title_style = TextStyle(size = helper_txt_size, weight = 'bold'),
+                    title_position = 0.6
+                )
+            )
+            legend_rows.append(
+                Row(
+                    spacing = 6,
+                    controls = [
+                        Container(width = 12, height = 12, bgcolor = colors[idx % len(colors)], border_radius = 2),
+                        Text(term, size = helper_txt_size, no_wrap = False, expand = True),
+                        Text(str(count), size = helper_txt_size),
+                    ],
+                )
+            )
+
+        legend = Column(controls = legend_rows, spacing = 4)
+        chart = Container(
+            width = radius * 2 + 20, 
+            height = radius * 2 + 50,
+            margin = padding.only(left = 5, right = 5, top = 10),
+            alignment = alignment.center,
+            content = PieChart(
+                sections = sections,
+                sections_space = 2, 
+                center_space_radius = int(radius * 0.4)
+            )
+        )
+        
+        self.results_chart_holder.content = Column(
+            controls = [chart, legend],
+            spacing = 10,
+            alignment = MainAxisAlignment.START,
+            horizontal_alignment = CrossAxisAlignment.CENTER,
+        )
+
     # Function for generating a query to the API database by pressing a 'Search for risks' button
-    def search_risks_btn(self):
+    def search_risks(self):
         is_valid = True
 
         if not self.validator.drug_name_correctness(self.user_drug.value):
@@ -251,6 +292,9 @@ class MedicineCheckPage(UserControl):
             self.btn_search_risks.disabled = True
             self.btn_search_risks.update()
 
+            divider_between_sections = Divider(thickness = 2, color = unit_color_dark)
+            result_title = Row(alignment = MainAxisAlignment.CENTER, controls = [Text('Results', weight = FontWeight.BOLD, size = title_txt_size)])
+            
             try:
                 filters = PatientFilters(
                     gender = int(self.user_sex.value),
@@ -258,27 +302,17 @@ class MedicineCheckPage(UserControl):
                     country = self.user_country.value or None,
                     age_window = 2.0, # +- 2 years
                 )
+                found_risks = fetch_risks(drug_query = self.user_drug.value, filters = filters)
 
-                result = fetch_risks(
-                    drug_query = self.user_drug.value,
-                    filters = filters,
-                    # top_n = 6,
-                    # suspect_only = True,
-                    # api_key = None,
-                    # timeout_sec = 30
-                )
-
-                if isinstance(result, dict) and result.get('error'):
+                if isinstance(found_risks, dict) and found_risks.get('error'):
                     self.results_section.controls.clear()
                     self.results_section.controls.extend([
-                        Divider(thickness = 2, color = unit_color_dark),
-                        Row(alignment = MainAxisAlignment.CENTER,
-                            controls = [Text('Results', weight = FontWeight.BOLD, size = 16)]
-                        ),
-                        Text(result['error'], size = general_txt_size, text_align = TextAlign.JUSTIFY),
+                        divider_between_sections,
+                        result_title,
+                        Text(found_risks['error'], size = general_txt_size, text_align = TextAlign.JUSTIFY),
                     ])
                     self.page.update()
-
+                    # try to scroll automatically
                     try:
                         self.check_content.scroll_to(key = 'results_anchor', duration = 400)
                         self.page.update()
@@ -287,38 +321,20 @@ class MedicineCheckPage(UserControl):
                     return
 
                 self.results_section.controls.clear()
-
-                total_res = result.get('meta', {}).get('results', {}).get('total', 0)
                 self.results_section.controls.extend([
-                    Divider(thickness = 2, color = unit_color_dark),
-                    Row(alignment = MainAxisAlignment.CENTER,
-                        controls = [Text('Results', weight = FontWeight.BOLD, size = 16)]
-                    ),
-                    Text(f'Total results: {total_res}', size = 12, text_align = TextAlign.JUSTIFY),
-                    # self.results_caption,
-                    # self.results_chart_holder,
-                    Divider(thickness = 1, color = unit_color_dark),
-                    Text('Top reactions', size = general_txt_size, weight = 'bold'),
-                    # self.results_list,
+                    divider_between_sections,
+                    result_title,
+                    Text('The results are based on reports from the last 5 years, filtered according to the information you provided', size = helper_txt_size, text_align = TextAlign.JUSTIFY),
                 ])
 
-                lst = Column(spacing = 4)
-                for item in result.get('results', []):
-                    term = item.get('term', '(unknown)')
-                    count = item.get('count', 0)
-                    lst.controls.append(
-                        Row(
-                            controls = [Text(term), Text(str(count))],
-                            alignment = MainAxisAlignment.SPACE_BETWEEN,
-                        )
-                    )
-                if not lst.controls:
-                    lst.controls.append(Text('No reactions found', italic = True, size = general_txt_size))
-                self.results_section.controls.append(lst)
+                results = found_risks.get('results', []) or []
+                self._show_chart_reactions(results)
+                self.results_section.controls.extend([self.results_chart_holder])
                 
                 self.check_content.update()
                 self.page.update()
-
+                
+                # try to scroll automatically
                 try:
                     self.check_content.scroll_to(key = 'results_anchor', duration = 400)
                     self.page.update()
@@ -327,11 +343,12 @@ class MedicineCheckPage(UserControl):
 
 
             except Exception as ex:
+                print(f'Error: {ex}')
                 self.results_section.controls.clear()
                 self.results_section.controls.extend([
-                    Divider(),
-                    Text('Results', size = 16, weight = FontWeight.BOLD),
-                    Text(f'Error: {ex}', italic = True),
+                    divider_between_sections,
+                    result_title,
+                    Text('Error: something went wrong. Please, try later', italic = True),
                 ])
                 self.update()
 
