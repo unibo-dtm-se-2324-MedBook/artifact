@@ -1,0 +1,6 @@
+# Pulling up the main dependencies
+-r requirements.txt
+
+# Testing
+pytest >= 8.1.0
+coverage >= 7.4.0
