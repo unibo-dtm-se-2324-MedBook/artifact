@@ -1,14 +1,14 @@
 from flet import *
 
-from utils.traits import *
-from ui.gui.first_page import FirstPage
-from ui.gui.login_page import LoginPage
-from ui.gui.sign_up_page import SignUpPage
-from ui.gui.main_page import MainPage
-from ui.gui.forgot_password_page import ForgPasswPage
-from ui.gui.settings_page import SettingsPage
-from ui.gui.documents_page import DocumentsPage
-from ui.gui.medication_check_page import MedicineCheckPage
+from artefact.utils.traits import *
+from artefact.ui.gui.first_page import FirstPage
+from artefact.ui.gui.login_page import LoginPage
+from artefact.ui.gui.sign_up_page import SignUpPage
+from artefact.ui.gui.main_page import MainPage
+from artefact.ui.gui.forgot_password_page import ForgPasswPage
+from artefact.ui.gui.settings_page import SettingsPage
+from artefact.ui.gui.documents_page import DocumentsPage
+from artefact.ui.gui.medication_check_page import MedicineCheckPage
 
 class WindowDrag(UserControl):
     def __init__(self):
