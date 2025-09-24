@@ -2,7 +2,7 @@ from flet import *
 import asyncio
 import datetime as dt
 import calendar
-from service.database import load_medicines_for_user
+from artefact.service.database import load_medicines_for_user
 from firebase_admin import auth as firebase_auth
 
 

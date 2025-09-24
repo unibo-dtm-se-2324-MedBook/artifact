@@ -1,10 +1,10 @@
 import pyrebase
 import os
 import json
-from service.database import db
+from artefact.service.database import db
 import uuid
 import requests
-from service.admin_delete_from_storage import delete_file_from_storage
+from artefact.service.admin_delete_from_storage import delete_file_from_storage
 
 
 FIREBASE_CONFIG_FILE = os.environ.get("FIREBASE_CONFIG_FILE", ".secrets/firebase.json")
