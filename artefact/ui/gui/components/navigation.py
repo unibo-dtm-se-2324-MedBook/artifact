@@ -1,6 +1,6 @@
 from flet import *
-from artefact.utils.traits import *
-from artefact.service.authentication import log_out
+from utils.traits import *
+from service.authentication import log_out
 
 class NavigationBar(UserControl):
     def __init__(self, current_page):

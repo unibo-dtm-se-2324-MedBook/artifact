@@ -1,6 +1,6 @@
 from flet import *
-from artefact.utils.traits import *
-from artefact.utils.validation import Validator
+from utils.traits import *
+from utils.validation import Validator
 
 class ForgPasswPage(Container):
     def __init__(self):

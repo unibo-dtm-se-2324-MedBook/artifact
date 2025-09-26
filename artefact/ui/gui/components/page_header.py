@@ -1,5 +1,5 @@
 from flet import *
-from artefact.utils.traits import *
+from utils.traits import *
 
 class PageHeader(UserControl):
     def __init__(self, current_page):

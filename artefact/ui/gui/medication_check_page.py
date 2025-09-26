@@ -1,11 +1,11 @@
 from flet import *
-from artefact.utils.traits import *
-from artefact.ui.gui.components.navigation import NavigationBar
-from artefact.ui.gui.components.page_header import PageHeader
-from artefact.service.notifications import NotificationService
-from artefact.utils.validation import Validator
-from artefact.utils.constants import SEX_OPTIONS, COUNTRY_OPTIONS
-from artefact.service.api_openfda_service import PatientFilters, fetch_risks
+from utils.traits import *
+from ui.gui.components.navigation import NavigationBar
+from ui.gui.components.page_header import PageHeader
+from service.notifications import NotificationService
+from utils.validation import Validator
+from utils.constants import SEX_OPTIONS, COUNTRY_OPTIONS
+from service.api_openfda_service import PatientFilters, fetch_risks
 from flet import PieChart, PieChartSection
 
 class MedicineCheckPage(UserControl):

@@ -1,11 +1,11 @@
 from flet import *
-from artefact.utils.traits import *
-from artefact.ui.gui.components.navigation import NavigationBar
-from artefact.ui.gui.components.page_header import PageHeader
-from artefact.service.notifications import NotificationService
+from utils.traits import *
+from ui.gui.components.navigation import NavigationBar
+from ui.gui.components.page_header import PageHeader
+from service.notifications import NotificationService
 from firebase_admin import auth as firebase_auth
-from artefact.utils.validation import Validator
-from artefact.service.authentication import change_user_info
+from utils.validation import Validator
+from service.authentication import change_user_info
 
 class SettingsPage(UserControl):
     
