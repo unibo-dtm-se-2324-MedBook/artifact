@@ -17,6 +17,7 @@ dependencies = [
     "pyrebase4==4.8.0",
     "firebase-admin==6.6.0",
     # "setuptools == 76.0.0"
+    "setuptools (>=80.9.0,<81.0.0)"
 ]
 
 # Usefull for PyPI research
@@ -26,6 +27,9 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12"
 ]
+
+[project.scripts]
+medbook = "artefact:main"
 
 [project.urls]
 Homepage = "https://github.com/unibo-dtm-se-2324-MedBook"
@@ -37,6 +41,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry] # Format PEP 621 can't manage packages
 packages = [{include = "artefact"}] # files to be included for publication
+include = ["artefact/assets/**"]
 
 [tool.poetry.group.dev]
 optional = true
