@@ -1,12 +1,12 @@
 from flet import *
 import calendar
 import datetime as dt
-from utils.traits import *
-from ui.gui.components.navigation import NavigationBar
-from ui.gui.components.page_header import PageHeader
-from service.database import save_pill_database, load_medicines_for_user, delete_pill_database
+from artefact.utils.traits import *
+from artefact.ui.gui.components.navigation import NavigationBar
+from artefact.ui.gui.components.page_header import PageHeader
+from artefact.service.database import save_pill_database, load_medicines_for_user, delete_pill_database
 from firebase_admin import auth as firebase_auth
-from service.notifications import NotificationService
+from artefact.service.notifications import NotificationService
 
 
 class MainPage(UserControl):

@@ -1,10 +1,10 @@
 from flet import *
-from utils.traits import *
-from ui.gui.components.navigation import NavigationBar
-from ui.gui.components.page_header import PageHeader
-from service.notifications import NotificationService
-from service.authentication import auth
-from service import documents_page_service
+from artefact.utils.traits import *
+from artefact.ui.gui.components.navigation import NavigationBar
+from artefact.ui.gui.components.page_header import PageHeader
+from artefact.service.notifications import NotificationService
+from artefact.service.authentication import auth
+from artefact.service import documents_page_service
 
 class DocumentsPage(UserControl):
     

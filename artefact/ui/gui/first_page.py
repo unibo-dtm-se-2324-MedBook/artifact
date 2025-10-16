@@ -1,7 +1,7 @@
 from flet import *
-from utils.traits import *
-from utils.validation import Validator
-from service.authentication import check_email
+from artefact.utils.traits import *
+from artefact.utils.validation import Validator
+from artefact.service.authentication import check_email
 
 class FirstPage(Container):
 
