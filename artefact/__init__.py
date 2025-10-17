@@ -77,5 +77,5 @@ class App(UserControl):
 def main():
     app(target = App, assets_dir = 'assets')
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     main()
