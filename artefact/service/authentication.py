@@ -21,18 +21,6 @@ with open(FIREBASE_CONFIG_FILE) as f:
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
 
-# Check
-# DB_EMAIL = os.environ.get("DB_EMAIL")
-# DB_USERNAME = os.environ.get("DB_USERNAME")
-# DB_PASSWORD = os.environ.get("DB_PASSWORD")
-
-# if not all([DB_EMAIL, DB_PASSWORD, DB_USERNAME]):
-#     raise Exception("Some DB_ envrionment variable is unset")
-
-# firebase_auth.create_user(
-#     email=DB_EMAIL,
-#     password=DB_PASSWORD,
-#     display_name=DB_USERNAME)
 
 def create_user(name, surname, email, password):
   try:
@@ -82,17 +70,11 @@ def get_user_info(token):
 # Update user information in authentication firebase
 def change_user_info(name: str, surname: str, email: str, uid: str, page):
   try:
-    # user_before = firebase_auth.get_user(uid)
-    # print('Before update:', user_before.display_name, user_before.email)
-
     firebase_auth.update_user(
       uid = uid,
       display_name = f'{name}_{surname}',
       email = email
     )
-
-    # user_after = firebase_auth.get_user(uid)
-    # print("After update:", user_after.display_name, user_after.email)
 
     page.snack_bar = SnackBar(
       content = Text('Info successfully updated'),
