@@ -1,4 +1,0 @@
-flet == 0.25.2
-pyrebase4 == 4.8.0
-firebase_admin == 6.6.0
-setuptools==76.0.0

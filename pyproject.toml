@@ -1,0 +1,52 @@
+[project]
+name = "medbook-medical-hub"
+
+# various metadata for publication
+version = "0.1.0"
+description = "A desktop application that helps users manage medications and personal health records. Features include a monthly calendar with daily reminders, medical document storage, personalized pill risk monitoring, and personal profile editing"
+authors = [{name = "Anastasiia Bakhmutova",email = "bakhmutovaaa@gmail.com"}]
+readme = "README.md"
+license = "CC-BY-NC-4.0"
+
+license-files = ["LICENSE"]
+
+# dependencies
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "flet==0.25.2",
+    "pyrebase4==4.8.0",
+    "firebase-admin==6.6.0",
+    # "setuptools == 76.0.0"
+    "setuptools (>=80.9.0,<81.0.0)"
+]
+
+# Usefull for PyPI research
+keywords = ["medication", "scheduler", "reminder", "medical records", "calendar", "health", "flet", "firebase", "desktop"]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12"
+]
+
+[project.scripts]
+medbook = "artefact:main"
+
+[project.urls]
+Homepage = "https://github.com/unibo-dtm-se-2324-MedBook"
+Repository = "https://github.com/unibo-dtm-se-2324-MedBook/artifact"
+
+[build-system] # packaging dependencies
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry] # Format PEP 621 can't manage packages
+packages = [{include = "artefact"}] # files to be included for publication
+include = ["artefact/assets/**"]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.0"
+coverage = "^7.4.0"
+pytest-cov = "^7.0.0"
