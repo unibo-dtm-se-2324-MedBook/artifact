@@ -38,6 +38,16 @@ jobs:
         run: |
           mkdir -p .secrets
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > .secrets/service_account.json
+
+      - name: Create Firebase key file
+        run: |
+          mkdir -p .secrets
+          echo '${{ secrets.FIREBASE_KEY_JSON }}' > .secrets/firebase.json
+
+      - name: Create Firebase admin key file
+        run: |
+          mkdir -p .secrets
+          echo '${{ secrets.FIREBASE_ADMIN_KEY_JSON }}' > .secrets/firebase-admin-key.json
     
       - name: Run tests with coverage
         run: |
