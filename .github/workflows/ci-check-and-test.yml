@@ -1,0 +1,56 @@
+name: CI syntax check & testing (pytest and coverage)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  check-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction --no-ansi --with dev
+
+      - name: Syntax check
+        run: |
+          # Checking the correctness of pyproject
+          poetry check
+          
+      - name: Create Firebase service account file
+        run: |
+          mkdir -p .secrets
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > .secrets/service_account.json
+
+      - name: Create Firebase key file
+        run: |
+          mkdir -p .secrets
+          echo '${{ secrets.FIREBASE_KEY_JSON }}' > .secrets/firebase.json
+
+      - name: Create Firebase admin key file
+        run: |
+          mkdir -p .secrets
+          echo '${{ secrets.FIREBASE_ADMIN_KEY_JSON }}' > .secrets/firebase-admin-key.json
+    
+      - name: Run tests with coverage
+        run: |
+          poetry run pytest \
+            --cov=artefact \
+            --cov-report=term-missing
