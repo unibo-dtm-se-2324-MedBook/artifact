@@ -33,7 +33,12 @@ jobs:
         run: |
           # Checking the correctness of pyproject
           poetry check
-
+          
+      - name: Create Firebase service account file
+        run: |
+          mkdir -p .secrets
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > .secrets/service_account.json
+    
       - name: Run tests with coverage
         run: |
           poetry run pytest \
