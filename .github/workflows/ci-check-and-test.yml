@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --no-interaction --no-ansi
+          poetry install --no-interaction --no-ansi --with dev
 
       - name: Syntax check
         run: |
