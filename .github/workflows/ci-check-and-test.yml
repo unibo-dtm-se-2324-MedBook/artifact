@@ -2,9 +2,9 @@ name: CI syntax check & testing (pytest and coverage)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   check-and-test:
