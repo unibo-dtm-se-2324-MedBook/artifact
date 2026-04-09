@@ -15,7 +15,6 @@ class DocumentsPage(UserControl):
 
         self.token = ''
         self.user_uid = ''
- 
         self.no_docs_text = Text('No documents uploaded yet', size = general_txt_size, italic = True, color = Colors.GREY, visible = False)
 
         # Area for uploaded documents
@@ -44,19 +43,16 @@ class DocumentsPage(UserControl):
 
 
     def build(self):
-        self.page.overlay.append(self.file_picker_upload)
-        self.page.overlay.append(self.file_picker_download)
+        if self.file_picker_upload not in self.page.overlay:
+            self.page.overlay.append(self.file_picker_upload)
 
-        page_header = PageHeader(current_page = None)
+        if self.file_picker_download not in self.page.overlay:
+            self.page.overlay.append(self.file_picker_download)
+
+        page_header = PageHeader(current_page = None)        
         
         self.token = self.page.session.get('token')
         self.user_uid = self.page.session.get('uid')
-
-        # Check the timer to start notification service only once
-        if self.token and not self.page.session.get('reminders_started'):
-            notif_service = NotificationService(self.page, self.token, page_header = page_header)
-            self.page.overlay.append(notif_service)
-        
 
         document_content = Container(
             content = Column(
@@ -111,7 +107,6 @@ class DocumentsPage(UserControl):
             )
         )
 
-        
         return self.content
 
     def did_mount(self):
@@ -164,9 +159,6 @@ class DocumentsPage(UserControl):
             preview = Icon(icons.PICTURE_AS_PDF, size = 30)
 
         document_cell = Container(
-            # border = border.all(1, unit_color_dark),
-            # border_radius = 10,
-            # padding = padding.only(bottom = 2, right = 3),
             content = Column(
                 spacing = 5,
                 tight = True,

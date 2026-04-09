@@ -9,6 +9,8 @@ from artefact.ui.gui.forgot_password_page import ForgPasswPage
 from artefact.ui.gui.settings_page import SettingsPage
 from artefact.ui.gui.documents_page import DocumentsPage
 from artefact.ui.gui.medication_check_page import MedicineCheckPage
+from artefact.service.notifications import NotificationService
+
 
 class WindowDrag(UserControl):
     def __init__(self):
@@ -32,6 +34,8 @@ class App(UserControl):
         self.page = page
         self.page.spacing = 0
 
+        self.notification_service = None
+        
         page.on_route_change = self.route_change
         page.go("/first_page")
 
@@ -63,7 +67,14 @@ class App(UserControl):
             self.medicine_check_page = MedicineCheckPage()
             self.page.add(WindowDrag(), Stack(expand=True, controls=[self.medicine_check_page]))
         
+        token = self.page.session.get('token')
+        uid = self.page.session.get('uid')
+        if token and self.notification_service is None:
+            self.notification_service = NotificationService(self.page, token, uid)
+            self.page.overlay.append(self.notification_service)
+
         self.page.update()
+
 
 def main():
     app(target = App, assets_dir = 'assets')

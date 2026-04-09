@@ -17,11 +17,7 @@ class PageHeader(UserControl):
             highlight_color ='#FFFAFA',
             on_click = self.shrink
         )
-
-        # Notification settings
-        self.unread_notif = False
-        self.notifications = []
-
+        
         self.btn_notification = IconButton(
             icon = icons.NOTIFICATIONS_OUTLINED,
             icon_size = 25,
@@ -34,15 +30,17 @@ class PageHeader(UserControl):
             on_click = lambda _: self.open_notifications_dialog()
         )
 
-        # Tests with notification dialog
-        # day = dt.datetime.today().day
-        # month = calendar.month_name[dt.datetime.today().month]
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill"})
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill2"})
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill3"})
-        # self.notifications.append({"date": f"{day:02d} {month}", "medicine_name": "Test Pill4"})
-
     def build(self):
+        if self.page.session.get('notifications') is None:
+            self.page.session.set('notifications', [])
+
+        if self.page.session.get('has_unread') is None:
+            self.page.session.set('has_unread', False)
+        
+        has_unread = self.page.session.get('has_unread') or False
+        self.btn_notification.icon_color = (Colors.RED_900 if has_unread else Colors.BLACK)
+        
+ 
         return Column(
             spacing = 4,
             controls = [
@@ -67,6 +65,8 @@ class PageHeader(UserControl):
 
     # Method to open window with notifications
     def open_notifications_dialog(self):
+        notifications = self.page.session.get('notifications') or []
+        
         notifs = [
             Container(
                 content = Column(
@@ -80,14 +80,14 @@ class PageHeader(UserControl):
                 border = border.all(1, unit_color_dark),
                 border_radius = 10
             )
-            for n in self.notifications
+            for n in notifications
         ]
         
         notif_dialog = AlertDialog(
             bgcolor = minor_light_bgcolor,
             inset_padding = padding.only(top = 20, left = 10, right = 10, bottom = 10),
 
-            title = Text("Notifications", size = 18, text_align = 'center'),
+            title = Text('Notifications', size = 18, text_align = 'center'),
             title_padding = padding.only(top = 20, bottom = 10),
 
             content_padding = padding.only(top = 0, left = 20, right = 20),
@@ -109,7 +109,7 @@ class PageHeader(UserControl):
             )]
         )
         
-        self.unread_notif = False
+        self.page.session.set('has_unread', False)
         self.btn_notification.icon_color = Colors.BLACK
 
         self.page.dialog = notif_dialog
@@ -123,8 +123,13 @@ class PageHeader(UserControl):
             self.page.dialog.open = False
             self.page.update()
 
+
     # Method to control if notifications were read or not
     def set_unread(self, has_unread: bool):
         self.unread_notif = has_unread
         self.btn_notification.icon_color = Colors.RED_900 if has_unread else Colors.BLACK
-        self.update()
+
+        if self.page is not None:
+            self.update()
+        else:
+            print('PageHeader not mounted yet')

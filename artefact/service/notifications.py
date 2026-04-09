@@ -7,14 +7,12 @@ from firebase_admin import auth as firebase_auth
 
 
 class NotificationService(UserControl):
-    def __init__(self, page, token, uid, page_header):
+    def __init__(self, page, token, uid):
         super().__init__()
         self.page = page
         self.token = token
         self.user_uid = uid
         
-        self.page_header = page_header
-
 
     # did_mount is a life-cycle hook of the UserControl.
     # It is called automatically by the Flet engine after your control is first built and added to the page (i.e. after build() and the actual rendering)
@@ -44,12 +42,16 @@ class NotificationService(UserControl):
         pills = load_medicines_for_user(self.user_uid, self.token, dt.date.today().year, dt.date.today().month).get(today, [])
         if not pills:
             return
-        self.page_header.notifications.clear()
+        notifications = []
 
         for p in pills:
-            self.page_header.notifications.append({
+            notifications.append({
                 'date': f'{day:02d} {month}',
                 'medicine_name': p['medicine_name']
             })
+        
+        self.page.session.set('notifications', notifications)
+        self.page.session.set('has_unread', True)
+        # print('notification is done')
 
-        self.page_header.set_unread(True)
+        self.page.update()

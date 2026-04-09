@@ -55,11 +55,7 @@ class MedicineCheckPage(UserControl):
         page_header = PageHeader(current_page = None)
         
         self.token = self.page.session.get('token')
-
-        # Check the timer to start notification service only once
-        if self.token and not self.page.session.get('reminders_started'):
-            notif_service = NotificationService(self.page, self.token, page_header = page_header)
-            self.page.overlay.append(notif_service)
+        self.user_uid = self.page.session.get('uid')
 
         row_drug, self.user_drug = self._create_txtfield_info('Drug:', 'Ibuprofen')
         row_age, self.user_age = self._create_txtfield_info('Age (years):', '26')
@@ -118,7 +114,6 @@ class MedicineCheckPage(UserControl):
                 border_radius = b_radius,
                 animate = animation.Animation(600, AnimationCurve.DECELERATE),
                 animate_scale = animation.Animation(400, curve = 'decelerate'),
-                # padding = padding.only(top = 15, left = 20, right = 40, bottom = 5), # 15
                 clip_behavior = ClipBehavior.ANTI_ALIAS,
                 content = page_content
             )]
