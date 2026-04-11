@@ -69,8 +69,8 @@ def test_build_starts_notification_service_once_when_no_reminders_flag(monkeypat
     before_len = len(page.overlay)
     dp.build()
 
-    assert created['n'] == 1
-    assert len(page.overlay) == before_len + 3  # upload + download + notification
+    assert created['n'] == 0
+    assert len(page.overlay) == before_len + 2  # upload + download
 
 
 def test_did_mount_calls_load_documents(docs_page, monkeypatch):

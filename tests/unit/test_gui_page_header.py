@@ -4,11 +4,21 @@ from artefact.ui.gui.components.page_header import PageHeader
 
 class PageMock:
     def __init__(self):
+        self.session = SessionMock()
         self.dialog = None
         self.update_calls = 0
     def update(self):
         self.update_calls += 1
+        
+class SessionMock:
+    def __init__(self):
+        self.data = {}
 
+    def get(self, key, default=None):
+        return self.data.get(key, default)
+
+    def set(self, key, value):
+        self.data[key] = value
 
 class CurrentPageStub:
     def __init__(self):
@@ -60,10 +70,11 @@ def test_btn_menu_on_click_triggers_shrink(header):
     assert header.current_page.updated is True
 
 def test_open_notifications_dialog_sets_dialog_marks_read_and_updates(header, page, monkeypatch):
-    header.notifications = [
+    page.session.set('notifications', [
         {'date': '03 Nov', 'medicine_name': 'Pill A'},
         {'date': '03 Nov', 'medicine_name': 'Pill B'},
-    ]
+    ])
+    page.session.set('has_unread', True)
 
     # Count the calls to self.update() by replacing the instance method
     update_calls = {'n': 0}
@@ -71,17 +82,20 @@ def test_open_notifications_dialog_sets_dialog_marks_read_and_updates(header, pa
 
     header.open_notifications_dialog()
 
-    assert header.unread_notif is False
-    assert getattr(header.btn_notification, 'icon_color', None) is not None
+    assert page.session.get('has_unread') is False
+    assert header.btn_notification.icon_color is not None
 
+    # dialog created
     assert page.dialog is not None
-    assert getattr(page.dialog, 'open', False) is True
+    assert page.dialog.open is True
 
-    assert page.update_calls == 1
+    # update called once
     assert update_calls['n'] == 1
 
 def test_open_notifications_dialog_works_with_empty_list(header, page):
-    header.notifications = [] # no notifications
+    page.session.set('notifications', []) # no notifications
+    page.session.set('has_unread', True)
+    
     header.update = lambda: None
 
     header.open_notifications_dialog()

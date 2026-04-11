@@ -10,6 +10,15 @@ class FakeWindow:
         self.width = None
         self.height = None
 
+class SessionMock:
+    def __init__(self):
+        self.data = {}
+
+    def get(self, key, default=None):
+        return self.data.get(key, default)
+
+    def set(self, key, value):
+        self.data[key] = value
 
 # Simulates a Flet page with .add(), .update(), .go() methods and a controls collection
 class FakePage:
@@ -20,10 +29,14 @@ class FakePage:
         self.window_title_bar_hidden = None
         self.bgcolor = None
         self.window_bgcolor = None
-        self.spacing = None
+        self.spacing = 0
         self.controls = []
         self.route = '/'
         self.on_route_change = None
+        self.dialog = None
+        self.overlay = []
+        
+        self.session = SessionMock()
 
     def add(self, *controls):
         self.controls.extend(controls)
@@ -78,7 +91,7 @@ class TestAppRouting(unittest.TestCase):
         first_child = stack.controls[0]
 
         self.assertTrue(isinstance(first_child, MagicMock)) # Check the type - it really is MagicMock
-        self.assertEqual(first_child._mock_name, expected_placeholder_name) # Compare name of mock with setUp
+        self.assertEqual(first_child._mock_name, expected_placeholder_name)
 
     def test_initial_route_is_first_page(self):
         self._assert_top_stack_contains('FirstPage')

@@ -69,8 +69,9 @@ def med_page_safe(med_page):
     return mp
 
 # TESTS
-def test_build_reads_token_and_appends_notif_service(page, monkeypatch):
+def test_build_reads_token_and_does_not_create_notif_service(page, monkeypatch):
     page.session.set('token', 'TOK')
+    page.session.set('uid', 'UID')
 
     added = {'count': 0}
     class DummyNotif:
@@ -84,7 +85,7 @@ def test_build_reads_token_and_appends_notif_service(page, monkeypatch):
     content = mp.build()
 
     assert content is not None
-    assert added['count'] >= 1
+    assert added['count'] == 0
 
 def test_txtfield_on_change_sets_border_and_updates(med_page_safe, page):
     mp = med_page_safe
